@@ -35,6 +35,7 @@ router.post("/signup", async (req, res) => {
     });
 
   } catch (error) {
+    console.log("SIGNUP ERROR:", error);
     res.status(500).json(error.message);
   }
 });
@@ -81,7 +82,9 @@ router.post("/login", async (req, res) => {
     });
 
   } catch (error) {
+    console.log("LOGIN ERROR:", error);
     res.status(500).json(error.message);
   }
 });
+
 module.exports = router;
