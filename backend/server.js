@@ -9,6 +9,7 @@ const skillRoutes = require("./routes/skills");
 const employeeRoutes = require("./routes/employees");
 const dashboardRoutes = require("./routes/dashboard");
 const uploadRoutes = require("./routes/upload");
+const leaveRoutes = require("./routes/leaves");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/leaves", leaveRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on ${process.env.PORT}`);

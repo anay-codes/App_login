@@ -1,6 +1,7 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "../App.css";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -8,7 +9,11 @@ function Dashboard() {
   const [stats, setStats] = useState({
     employees: 0,
     departments: 0,
-    skills: 0
+    skills: 0,
+    pendingLeaves: 0,
+    approvedLeaves: 0,
+    rejectedLeaves: 0,
+    employeesOnLeave: 0
   });
 
   const token = localStorage.getItem("token");
@@ -39,75 +44,154 @@ function Dashboard() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card shadow p-4">
+    <div className="dashboard-layout">
 
-        <h1 className="text-center">
-          Employee Management Dashboard
-        </h1>
+      <div className="sidebar">
 
-        <div className="row mt-4">
-
-          <div className="col-md-4">
-            <div className="card text-center p-3">
-              <h5>Total Employees</h5>
-              <h2>{stats.employees}</h2>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card text-center p-3">
-              <h5>Total Departments</h5>
-              <h2>{stats.departments}</h2>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card text-center p-3">
-              <h5>Total Skills</h5>
-              <h2>{stats.skills}</h2>
-            </div>
-          </div>
-
-        </div>
+        <h3 className="sidebar-title">
+          EMS
+        </h3>
 
         <button
-  className="btn btn-success mt-4 me-2"
-  onClick={() => navigate("/create-employee")}
->
-  Create Employee
-</button>
+          className="sidebar-btn"
+          onClick={() => navigate("/dashboard")}
+        >
+          Dashboard
+        </button>
 
         <button
-  className="btn btn-primary mt-4 me-2"
-  onClick={() => navigate("/employees")}
->
-  View Employees
-</button>
-
-
-<button
-  className="btn btn-warning mt-4 me-2"
-  onClick={() => navigate("/departments")}
->
-  Departments
-</button>
-
-<button
-  className="btn btn-info mt-4 me-2"
-  onClick={() => navigate("/skills")}
->
-  Skills
-</button>
+          className="sidebar-btn"
+          onClick={() => navigate("/create-employee")}
+        >
+          Create Employee
+        </button>
 
         <button
-          className="btn btn-danger mt-4"
+          className="sidebar-btn"
+          onClick={() => navigate("/employees")}
+        >
+          Employee List
+        </button>
+
+        <button
+          className="sidebar-btn"
+          onClick={() => navigate("/departments")}
+        >
+          Departments
+        </button>
+
+        <button
+          className="sidebar-btn"
+          onClick={() => navigate("/skills")}
+        >
+          Skills
+        </button>
+
+        <button
+          className="sidebar-btn"
+          onClick={() => navigate("/leave-application")}
+        >
+          Apply Leave
+        </button>
+
+        <button
+          className="sidebar-btn"
+          onClick={() => navigate("/leave-list")}
+        >
+          Manage Leaves
+        </button>
+
+        <button
+          className="sidebar-btn logout-btn"
           onClick={logout}
         >
           Logout
         </button>
 
       </div>
+
+      <div className="dashboard-content">
+
+        <h1 className="dashboard-heading">
+          Employee Management Dashboard
+        </h1>
+
+        <div className="stats-grid">
+
+          <div className="stat-card">
+            <h5>Total Employees</h5>
+            <h2>{stats.employees}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h5>Departments</h5>
+            <h2>{stats.departments}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h5>Skills</h5>
+            <h2>{stats.skills}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h5>Pending Leaves</h5>
+            <h2>{stats.pendingLeaves}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h5>Approved Leaves</h5>
+            <h2>{stats.approvedLeaves}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h5>Rejected Leaves</h5>
+            <h2>{stats.rejectedLeaves}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h5>Employees On Leave</h5>
+            <h2>{stats.employeesOnLeave}</h2>
+          </div>
+
+        </div>
+
+        <div className="analytics-box">
+          <h4>HR Analytics Overview</h4>
+
+          <p>
+            Total Employees: <strong>{stats.employees}</strong>
+          </p>
+
+          <p>
+            Active Employees:{" "}
+            <strong>
+              {stats.employees - stats.employeesOnLeave}
+            </strong>
+          </p>
+
+          <p>
+            Employees Currently On Leave:{" "}
+            <strong>{stats.employeesOnLeave}</strong>
+          </p>
+
+          <p>
+            Pending Leave Requests:{" "}
+            <strong>{stats.pendingLeaves}</strong>
+          </p>
+
+          <p>
+            Approved Leave Requests:{" "}
+            <strong>{stats.approvedLeaves}</strong>
+          </p>
+
+          <p>
+            Rejected Leave Requests:{" "}
+            <strong>{stats.rejectedLeaves}</strong>
+          </p>
+        </div>
+
+      </div>
+
     </div>
   );
 }

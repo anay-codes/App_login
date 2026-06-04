@@ -9,6 +9,8 @@ import CreateEmployee from "./pages/CreateEmployee";
 import EditEmployee from "./pages/EditEmployee";
 import Departments from "./pages/Departments";
 import Skills from "./pages/Skills";
+import LeaveApplication from "./pages/LeaveApplication";
+import LeaveList from "./pages/LeaveList";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
         <Route path="/edit-employee/:id" element={<EditEmployee />} />
         <Route path="/departments" element={<Departments />} />
         <Route path="/skills" element={<Skills />} />
+        <Route path="/leave-application" element={<LeaveApplication />} />
+        <Route path="/leave-list" element={<LeaveList />} />
       </Routes>
     </BrowserRouter>
   );

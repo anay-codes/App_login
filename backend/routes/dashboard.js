@@ -16,10 +16,33 @@ router.get("/stats", async (req, res) => {
       "SELECT COUNT(*) FROM skills"
     );
 
+    const pendingLeaves = await pool.query(
+      "SELECT COUNT(*) FROM leave_applications WHERE status = 'Pending'"
+    );
+
+    const approvedLeaves = await pool.query(
+      "SELECT COUNT(*) FROM leave_applications WHERE status = 'Approved'"
+    );
+
+    const rejectedLeaves = await pool.query(
+      "SELECT COUNT(*) FROM leave_applications WHERE status = 'Rejected'"
+    );
+
+    const employeesOnLeave = await pool.query(
+      `SELECT COUNT(*)
+       FROM leave_applications
+       WHERE status = 'Approved'
+       AND CURRENT_DATE BETWEEN from_date AND to_date`
+    );
+
     res.json({
       employees: employees.rows[0].count,
       departments: departments.rows[0].count,
-      skills: skills.rows[0].count
+      skills: skills.rows[0].count,
+      pendingLeaves: pendingLeaves.rows[0].count,
+      approvedLeaves: approvedLeaves.rows[0].count,
+      rejectedLeaves: rejectedLeaves.rows[0].count,
+      employeesOnLeave: employeesOnLeave.rows[0].count
     });
 
   } catch (error) {
