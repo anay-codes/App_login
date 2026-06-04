@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import EmployeeList from "./pages/EmployeeList";
 import CreateEmployee from "./pages/CreateEmployee";
+import EditEmployee from "./pages/EditEmployee";
 import Departments from "./pages/Departments";
 import Skills from "./pages/Skills";
 
@@ -16,7 +17,6 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
 
         <Route path="/login" element={<Login />} />
-
         <Route path="/signup" element={<Signup />} />
 
         <Route
@@ -27,6 +27,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/employees" element={<EmployeeList />} />
         <Route path="/create-employee" element={<CreateEmployee />} />
+        <Route path="/edit-employee/:id" element={<EditEmployee />} />
         <Route path="/departments" element={<Departments />} />
         <Route path="/skills" element={<Skills />} />
       </Routes>

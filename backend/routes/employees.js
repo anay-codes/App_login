@@ -85,4 +85,70 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get Single Employee
+router.get("/:id", async (req, res) => {
+  try {
+    const employee = await pool.query(
+      `SELECT *
+       FROM employee_profiles
+       WHERE id = $1`,
+      [req.params.id]
+    );
+
+    res.json(employee.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Server Error");
+  }
+});
+
+// Update Employee
+router.put("/:id", async (req, res) => {
+  try {
+    const {
+      phone,
+      address,
+      designation,
+      salary
+    } = req.body;
+
+    await pool.query(
+      `UPDATE employee_profiles
+       SET
+       phone = $1,
+       address = $2,
+       designation = $3,
+       salary = $4
+       WHERE id = $5`,
+      [
+        phone,
+        address,
+        designation,
+        salary,
+        req.params.id
+      ]
+    );
+
+    res.json("Employee Updated");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Server Error");
+  }
+});
+
+// Delete Employee
+router.delete("/:id", async (req, res) => {
+  try {
+    await pool.query(
+      "DELETE FROM employee_profiles WHERE id = $1",
+      [req.params.id]
+    );
+
+    res.json("Employee Deleted");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Server Error");
+  }
+});
+
 module.exports = router;
