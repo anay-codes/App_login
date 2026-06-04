@@ -27,6 +27,7 @@ function EmployeeList() {
       <table className="table table-bordered">
         <thead>
           <tr>
+            <th>Profile</th>
             <th>Name</th>
             <th>Email</th>
             <th>Department</th>
@@ -39,6 +40,20 @@ function EmployeeList() {
         <tbody>
           {employees.map((emp) => (
             <tr key={emp.id}>
+              <td>
+                {emp.profile_image ? (
+                  <img
+                    src={`http://localhost:5000/uploads/${emp.profile_image}`}
+                    alt="profile"
+                    width="60"
+                    height="60"
+                    style={{ objectFit: "cover", borderRadius: "50%" }}
+                  />
+                ) : (
+                  "No Image"
+                )}
+              </td>
+
               <td>{emp.name}</td>
               <td>{emp.email}</td>
               <td>{emp.department_name}</td>

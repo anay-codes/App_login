@@ -11,13 +11,26 @@ router.post("/", async (req, res) => {
       phone,
       address,
       designation,
-      salary
+      salary,
+      profile_image,
+      resume_file,
+      document_file
     } = req.body;
 
     const employee = await pool.query(
       `INSERT INTO employee_profiles
-      (user_id, department_id, phone, address, designation, salary)
-      VALUES($1,$2,$3,$4,$5,$6)
+      (
+        user_id,
+        department_id,
+        phone,
+        address,
+        designation,
+        salary,
+        profile_image,
+        resume_file,
+        document_file
+      )
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
       RETURNING *`,
       [
         user_id,
@@ -25,7 +38,10 @@ router.post("/", async (req, res) => {
         phone,
         address,
         designation,
-        salary
+        salary,
+        profile_image,
+        resume_file,
+        document_file
       ]
     );
 
@@ -47,8 +63,12 @@ router.get("/", async (req, res) => {
         u.email,
         d.department_name,
         ep.phone,
+        ep.address,
         ep.designation,
-        ep.salary
+        ep.salary,
+        ep.profile_image,
+        ep.resume_file,
+        ep.document_file
       FROM employee_profiles ep
       INNER JOIN users u
       ON ep.user_id = u.id

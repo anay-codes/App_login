@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 function CreateEmployee() {
   const navigate = useNavigate();
 
+  const [profile, setProfile] = useState(null);
+  const [resume, setResume] = useState(null);
+  const [document, setDocument] = useState(null);
+
   const [formData, setFormData] = useState({
     user_id: "",
     department_id: "",
@@ -25,14 +29,44 @@ function CreateEmployee() {
     e.preventDefault();
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/employees",
-        formData
+
+      const uploadData = new FormData();
+
+      if (profile) {
+        uploadData.append("profile", profile);
+      }
+
+      if (resume) {
+        uploadData.append("resume", resume);
+      }
+
+      if (document) {
+        uploadData.append("document", document);
+      }
+
+      const uploadResponse = await axios.post(
+        "http://localhost:5000/api/upload",
+        uploadData
       );
 
-      alert("Employee Created");
+      console.log(uploadResponse.data);
+
+      alert(JSON.stringify(uploadResponse.data));
+
+      await axios.post(
+  "http://localhost:5000/api/employees",
+  {
+    ...formData,
+    profile_image: uploadResponse.data.profile_image,
+    resume_file: uploadResponse.data.resume_file,
+    document_file: uploadResponse.data.document_file
+  }
+);
+
+      alert("Employee Created Successfully");
 
       navigate("/employees");
+
     } catch (error) {
       console.log(error);
       alert("Error");
@@ -86,6 +120,27 @@ function CreateEmployee() {
           name="salary"
           placeholder="Salary"
           onChange={handleChange}
+        />
+
+        <label className="mb-2">Profile Image</label>
+        <input
+          type="file"
+          className="form-control mb-3"
+          onChange={(e) => setProfile(e.target.files[0])}
+        />
+
+        <label className="mb-2">Resume</label>
+        <input
+          type="file"
+          className="form-control mb-3"
+          onChange={(e) => setResume(e.target.files[0])}
+        />
+
+        <label className="mb-2">Document</label>
+        <input
+          type="file"
+          className="form-control mb-3"
+          onChange={(e) => setDocument(e.target.files[0])}
         />
 
         <button
