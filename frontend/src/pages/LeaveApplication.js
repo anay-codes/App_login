@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../App.css";
 
 function LeaveApplication() {
   const navigate = useNavigate();
-
   const [employees, setEmployees] = useState([]);
   const [leaveTypes, setLeaveTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [daysRequested, setDaysRequested] = useState(0);
 
   const [formData, setFormData] = useState({
     employee_id: "",
@@ -23,12 +26,24 @@ function LeaveApplication() {
     loadLeaveTypes();
   }, []);
 
+  useEffect(() => {
+    if (formData.from_date && formData.to_date) {
+      const from = new Date(formData.from_date);
+      const to = new Date(formData.to_date);
+      const days = Math.ceil((to - from) / (1000 * 60 * 60 * 24)) + 1;
+      setDaysRequested(days > 0 ? days : 0);
+    } else {
+      setDaysRequested(0);
+    }
+  }, [formData.from_date, formData.to_date]);
+
   const loadEmployees = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/employees");
       setEmployees(res.data);
     } catch (err) {
       console.error("Error loading employees", err);
+      setError("Failed to load employees");
     }
   };
 
@@ -36,8 +51,11 @@ function LeaveApplication() {
     try {
       const res = await axios.get("http://localhost:5000/api/leaves/leave-types");
       setLeaveTypes(res.data);
+      setLoading(false);
     } catch (err) {
       console.error("Error loading leave types", err);
+      setError("Failed to load leave types");
+      setLoading(false);
     }
   };
 
@@ -58,6 +76,12 @@ function LeaveApplication() {
       return;
     }
 
+    if (daysRequested <= 0) {
+      setError("Invalid date range. End date must be after start date.");
+      return;
+    }
+
+    setSubmitting(true);
     try {
       await axios.post("http://localhost:5000/api/leaves/apply", {
         employee_id: parseInt(formData.employee_id),
@@ -67,125 +91,211 @@ function LeaveApplication() {
         reason: formData.reason
       });
 
-      setSuccess("Leave applied successfully!");
-      alert("Leave Application Submitted Successfully");
-      navigate("/leave-list");
+      setSuccess("Leave application submitted successfully!");
+      setTimeout(() => navigate("/leave-list"), 1500);
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data) {
-        setError(err.response.data);
+        setError(err.response.data.message || "Error submitting leave application");
       } else {
         setError("Error submitting leave application. Please check remaining balance.");
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card shadow p-4" style={{ maxWidth: "600px", margin: "0 auto" }}>
-        <h2 className="mb-4 text-center">Apply for Leave</h2>
+    <div className="layout">
 
-        {error && <div className="alert alert-danger">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
+      <div className="sidebar">
+        <h3 className="sidebar-title">EMS</h3>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Employee <span className="text-danger">*</span></label>
-            <select
-              className="form-select"
-              name="employee_id"
-              value={formData.employee_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">-- Select Employee --</option>
-              {employees.map((emp) => (
-                <option key={emp.id} value={emp.id}>
-                  {emp.name} ({emp.email}) - {emp.department_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Leave Type <span className="text-danger">*</span></label>
-            <select
-              className="form-select"
-              name="leave_type_id"
-              value={formData.leave_type_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">-- Select Leave Type --</option>
-              {leaveTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.leave_name} (Max: {type.total_days} days)
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="row">
-            <div className="col-md-6 mb-3">
-              <label className="form-label">Start Date <span className="text-danger">*</span></label>
-              <input
-                type="date"
-                className="form-control"
-                name="from_date"
-                value={formData.from_date}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="col-md-6 mb-3">
-              <label className="form-label">End Date <span className="text-danger">*</span></label>
-              <input
-                type="date"
-                className="form-control"
-                name="to_date"
-                value={formData.to_date}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Reason</label>
-            <textarea
-              className="form-control"
-              name="reason"
-              rows="3"
-              placeholder="Provide a reason for the leave application..."
-              value={formData.reason}
-              onChange={handleChange}
-            ></textarea>
-          </div>
-
-          <div className="d-flex justify-content-between mt-4">
-            <button type="submit" className="btn btn-success px-4">
-              Apply Leave
-            </button>
-            <div>
-              <button
-                type="button"
-                className="btn btn-secondary me-2"
-                onClick={() => navigate("/leave-list")}
-              >
-                Leave List
-              </button>
-              <button
-                type="button"
-                className="btn btn-dark"
-                onClick={() => navigate("/dashboard")}
-              >
-                Dashboard
-              </button>
-            </div>
-          </div>
-        </form>
+        <div className="sidebar-nav">
+          <button className="sidebar-btn" onClick={() => navigate("/dashboard")}>
+            Dashboard
+          </button>
+          <button className="sidebar-btn" onClick={() => navigate("/create-employee")}>
+            Create Employee
+          </button>
+          <button className="sidebar-btn" onClick={() => navigate("/employees")}>
+            Employee List
+          </button>
+          <button className="sidebar-btn" onClick={() => navigate("/departments")}>
+            Departments
+          </button>
+          <button className="sidebar-btn" onClick={() => navigate("/skills")}>
+            Skills
+          </button>
+          <button className="sidebar-btn active" onClick={() => navigate("/leave-application")}>
+            Apply Leave
+          </button>
+          <button className="sidebar-btn" onClick={() => navigate("/leave-list")}>
+            Manage Leaves
+          </button>
+          <button
+            className="sidebar-btn logout-btn"
+            onClick={() => {
+              localStorage.removeItem("token");
+              navigate("/login");
+            }}
+          >
+            Logout
+          </button>
+        </div>
       </div>
+
+      <div className="content-wrapper">
+
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Apply for Leave</h1>
+            <p className="page-subtitle">Submit a new leave application</p>
+          </div>
+        </div>
+
+        {success && <div className="alert alert-success">{success}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {loading ? (
+          <div className="loading-container">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3 text-muted">Loading data...</p>
+          </div>
+        ) : (
+          <div className="card-standard" style={{ maxWidth: "700px" }}>
+            <form onSubmit={handleSubmit}>
+
+              <div className="form-section">
+                <h5 className="form-section-title">Leave Details</h5>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Employee <span className="required">*</span>
+                  </label>
+                  <select
+                    className="form-select"
+                    name="employee_id"
+                    value={formData.employee_id}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">-- Select Employee --</option>
+                    {employees.map((emp) => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.name} ({emp.email}) - {emp.department_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Leave Type <span className="required">*</span>
+                  </label>
+                  <select
+                    className="form-select"
+                    name="leave_type_id"
+                    value={formData.leave_type_id}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">-- Select Leave Type --</option>
+                    {leaveTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.leave_name} (Max: {type.total_days} days)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">
+                        Start Date <span className="required">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        name="from_date"
+                        value={formData.from_date}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">
+                        End Date <span className="required">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        name="to_date"
+                        value={formData.to_date}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {daysRequested > 0 && (
+                  <div className="alert alert-info">
+                    <strong>Days Requested:</strong> {daysRequested} day{daysRequested > 1 ? "s" : ""}
+                  </div>
+                )}
+
+                <div className="form-group">
+                  <label className="form-label">Reason</label>
+                  <textarea
+                    className="form-control"
+                    name="reason"
+                    rows="3"
+                    placeholder="Provide a reason for the leave application..."
+                    value={formData.reason}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="page-actions" style={{ justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => navigate("/leave-list")}
+                  disabled={submitting}
+                >
+                  View Leave List
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => navigate("/dashboard")}
+                  disabled={submitting}
+                >
+                  Dashboard
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-success"
+                  disabled={submitting}
+                >
+                  {submitting ? "Applying..." : "Apply Leave"}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        )}
+
+      </div>
+
     </div>
   );
 }

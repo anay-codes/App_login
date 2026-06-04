@@ -1,140 +1,255 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../App.css";
 
 function EmployeeList() {
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const deleteEmployee = async (id) => {
-  try {
-    await axios.delete(
-      `http://localhost:5000/api/employees/${id}`
-    );
-
-    loadEmployees();
-  } catch (error) {
-    console.log(error);
-  }
-};
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/employees/${id}`
+      );
+      loadEmployees();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     loadEmployees();
   }, []);
 
   const loadEmployees = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(
         "http://localhost:5000/api/employees"
       );
-
       setEmployees(res.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Employee List</h2>
+    <div className="layout">
 
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Profile</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Phone</th>
-            <th>Designation</th>
-            <th>Salary</th>
-            <th>Resume</th>
-            <th>Document</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div className="sidebar">
 
-        <tbody>
-          {employees.map((emp) => (
-            <tr key={emp.id}>
-              <td>
-                {emp.profile_image ? (
-                  <img
-                    src={`http://localhost:5000/uploads/${emp.profile_image}`}
-                    alt="profile"
-                    width="60"
-                    height="60"
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: "50%"
-                    }}
-                  />
-                ) : (
-                  "No Image"
-                )}
-              </td>
+        <h3 className="sidebar-title">
+          EMS
+        </h3>
 
-              <td>{emp.name}</td>
-              <td>{emp.email}</td>
-              <td>{emp.department_name}</td>
-              <td>{emp.phone}</td>
-              <td>{emp.designation}</td>
-              <td>{emp.salary}</td>
+        <div className="sidebar-nav">
+          <button
+            className="sidebar-btn"
+            onClick={() => navigate("/dashboard")}
+          >
+            Dashboard
+          </button>
 
-              <td>
-                {emp.resume_file ? (
-                  <a
-                    href={`http://localhost:5000/uploads/${emp.resume_file}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-primary btn-sm"
-                  >
-                    Resume
-                  </a>
-                ) : (
-                  "N/A"
-                )}
-              </td>
+          <button
+            className="sidebar-btn"
+            onClick={() => navigate("/create-employee")}
+          >
+            Create Employee
+          </button>
 
-              <td>
-                {emp.document_file ? (
-                  <a
-                    href={`http://localhost:5000/uploads/${emp.document_file}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-secondary btn-sm"
-                  >
-                    Document
-                  </a>
-                ) : (
-                  "N/A"
-                )}
-              </td>
+          <button
+            className="sidebar-btn active"
+            onClick={() => navigate("/employees")}
+          >
+            Employee List
+          </button>
 
-              <td>
+          <button
+            className="sidebar-btn"
+            onClick={() => navigate("/departments")}
+          >
+            Departments
+          </button>
+
+          <button
+            className="sidebar-btn"
+            onClick={() => navigate("/skills")}
+          >
+            Skills
+          </button>
+
+          <button
+            className="sidebar-btn"
+            onClick={() => navigate("/leave-application")}
+          >
+            Apply Leave
+          </button>
+
+          <button
+            className="sidebar-btn"
+            onClick={() => navigate("/leave-list")}
+          >
+            Manage Leaves
+          </button>
+
+          <button
+            className="sidebar-btn logout-btn"
+            onClick={() => {
+              localStorage.removeItem("token");
+              navigate("/login");
+            }}
+          >
+            Logout
+          </button>
+        </div>
+
+      </div>
+
+      <div className="content-wrapper">
+
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Employee List</h1>
+            <p className="page-subtitle">Manage and view all employees</p>
+          </div>
+          <div className="page-actions">
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/create-employee")}
+            >
+              + Create Employee
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="loading-container">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3 text-muted">Loading employees...</p>
+          </div>
+        ) : employees.length === 0 ? (
+          <div className="card-standard">
+            <div className="empty-state">
+              <div className="empty-state-title">No Employees Found</div>
+              <div className="empty-state-description">
+                There are no employees in the system yet. Create one to get started.
+              </div>
+              <div className="empty-state-action">
                 <button
-                  className="btn btn-warning btn-sm"
-                  onClick={() =>
-                    navigate(`/edit-employee/${emp.id}`)
-                  }
+                  className="btn btn-primary"
+                  onClick={() => navigate("/create-employee")}
                 >
-                  Edit
+                  Create First Employee
                 </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="card-standard">
+            <div className="table-wrapper">
+              <table className="table-standard">
+                <thead>
+                  <tr>
+                    <th>Profile</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Phone</th>
+                    <th>Designation</th>
+                    <th>Salary</th>
+                    <th>Resume</th>
+                    <th>Document</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-                 
+                <tbody>
+                  {employees.map((emp) => (
+                    <tr key={emp.id}>
+                      <td>
+                        {emp.profile_image ? (
+                          <img
+                            src={`http://localhost:5000/uploads/${emp.profile_image}`}
+                            alt="profile"
+                            className="table-image"
+                          />
+                        ) : (
+                          <span className="text-muted">No Image</span>
+                        )}
+                      </td>
 
-              <button
-              className="btn btn-danger btn-sm"
-              onClick={() => deleteEmployee(emp.id)}
-              >
-                Delete
-              </button>
+                      <td>{emp.name}</td>
+                      <td>{emp.email}</td>
+                      <td>{emp.department_name}</td>
+                      <td>{emp.phone}</td>
+                      <td>{emp.designation}</td>
+                      <td>{emp.salary}</td>
 
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                      <td>
+                        {emp.resume_file ? (
+                          <a
+                            href={`http://localhost:5000/uploads/${emp.resume_file}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn btn-primary btn-sm"
+                          >
+                            Resume
+                          </a>
+                        ) : (
+                          <span className="text-muted">N/A</span>
+                        )}
+                      </td>
+
+                      <td>
+                        {emp.document_file ? (
+                          <a
+                            href={`http://localhost:5000/uploads/${emp.document_file}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn btn-secondary btn-sm"
+                          >
+                            Document
+                          </a>
+                        ) : (
+                          <span className="text-muted">N/A</span>
+                        )}
+                      </td>
+
+                      <td>
+                        <div className="table-action-buttons">
+                          <button
+                            className="btn btn-warning btn-sm"
+                            onClick={() =>
+                              navigate(`/edit-employee/${emp.id}`)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => deleteEmployee(emp.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+      </div>
+
     </div>
   );
 }
