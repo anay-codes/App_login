@@ -1,6 +1,7 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Sidebar from "../components/Sidebar";
 import "../App.css";
 
 function Dashboard() {
@@ -14,7 +15,10 @@ function Dashboard() {
     pendingLeaves: 0,
     approvedLeaves: 0,
     rejectedLeaves: 0,
-    employeesOnLeave: 0
+    employeesOnLeave: 0,
+    totalAssets: 0,
+    allocatedAssets: 0,
+    availableAssets: 0
   });
 
   const token = localStorage.getItem("token");
@@ -48,73 +52,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard-layout">
-
-      <div className="sidebar">
-
-        <h3 className="sidebar-title">
-          EMS
-        </h3>
-
-        <div className="sidebar-nav">
-          <button
-            className="sidebar-btn active"
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </button>
-
-          <button
-            className="sidebar-btn"
-            onClick={() => navigate("/create-employee")}
-          >
-            Create Employee
-          </button>
-
-          <button
-            className="sidebar-btn"
-            onClick={() => navigate("/employees")}
-          >
-            Employee List
-          </button>
-
-          <button
-            className="sidebar-btn"
-            onClick={() => navigate("/departments")}
-          >
-            Departments
-          </button>
-
-          <button
-            className="sidebar-btn"
-            onClick={() => navigate("/skills")}
-          >
-            Skills
-          </button>
-
-          <button
-            className="sidebar-btn"
-            onClick={() => navigate("/leave-application")}
-          >
-            Apply Leave
-          </button>
-
-          <button
-            className="sidebar-btn"
-            onClick={() => navigate("/leave-list")}
-          >
-            Manage Leaves
-          </button>
-
-          <button
-            className="sidebar-btn logout-btn"
-            onClick={logout}
-          >
-            Logout
-          </button>
-        </div>
-
-      </div>
-
+      <Sidebar />
       <div className="dashboard-content">
 
         <div className="page-header">
@@ -167,10 +105,25 @@ function Dashboard() {
                 <h2>{stats.employeesOnLeave}</h2>
               </div>
 
+              <div className="stat-card">
+                <h5>Total Assets</h5>
+                <h2>{stats.totalAssets}</h2>
+              </div>
+
+              <div className="stat-card stat-secondary">
+                <h5>Allocated Assets</h5>
+                <h2>{stats.allocatedAssets}</h2>
+              </div>
+
+              <div className="stat-card stat-warning">
+                <h5>Available Assets</h5>
+                <h2>{stats.availableAssets}</h2>
+              </div>
+
             </div>
 
             <div className="analytics-box">
-              <h4>HR Analytics Overview</h4>
+              <h4>HR & Asset Analytics Overview</h4>
 
               <p>
                 Total Employees: <strong>{stats.employees}</strong>

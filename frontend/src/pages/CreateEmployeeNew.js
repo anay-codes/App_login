@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 import "../App.css";
 
 function CreateEmployee() {
@@ -76,43 +77,7 @@ function CreateEmployee() {
   return (
     <div className="layout">
 
-      <div className="sidebar">
-        <h3 className="sidebar-title">EMS</h3>
-
-        <div className="sidebar-nav">
-          <button className="sidebar-btn" onClick={() => navigate("/dashboard")}>
-            Dashboard
-          </button>
-          <button className="sidebar-btn active" onClick={() => navigate("/create-employee")}>
-            Create Employee
-          </button>
-          <button className="sidebar-btn" onClick={() => navigate("/employees")}>
-            Employee List
-          </button>
-          <button className="sidebar-btn" onClick={() => navigate("/departments")}>
-            Departments
-          </button>
-          <button className="sidebar-btn" onClick={() => navigate("/skills")}>
-            Skills
-          </button>
-          <button className="sidebar-btn" onClick={() => navigate("/leave-application")}>
-            Apply Leave
-          </button>
-          <button className="sidebar-btn" onClick={() => navigate("/leave-list")}>
-            Manage Leaves
-          </button>
-          <button
-            className="sidebar-btn logout-btn"
-            onClick={() => {
-              localStorage.removeItem("token");
-              navigate("/login");
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-
+      <Sidebar />
       <div className="content-wrapper">
 
         <div className="page-header">

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
+const NotificationRepository = require("../repositories/NotificationRepository");
 
 // Get all leave types
 router.get("/leave-types", async (req, res) => {
@@ -213,6 +214,27 @@ router.put("/approve/:id", async (req, res) => {
       [id, 1, "Approve", remarks || "Approved"]
     );
 
+    // Notify the employee
+    try {
+      const empUser = await pool.query(
+        "SELECT user_id FROM employee_profiles WHERE id = $1",
+        [application.employee_id]
+      );
+      if (empUser.rows.length > 0) {
+        await NotificationRepository.createNotification({
+          user_id: empUser.rows[0].user_id,
+          title: "Leave Approved",
+          message: `Your leave request from ${application.from_date.toISOString().split('T')[0]} to ${application.to_date.toISOString().split('T')[0]} has been approved.`,
+          notification_type: "LEAVE_APPROVAL",
+          related_entity_type: "Leave",
+          related_entity_id: id,
+          action_url: `/leave-list`
+        });
+      }
+    } catch (notifErr) {
+      console.error("Notification error (non-fatal):", notifErr.message);
+    }
+
     res.json("Leave Approved Successfully");
   } catch (error) {
     console.error(error);
@@ -253,6 +275,27 @@ router.put("/reject/:id", async (req, res) => {
        VALUES ($1, $2, $3, $4, NOW())`,
       [id, 1, "Reject", remarks || "Rejected"]
     );
+
+    // Notify the employee
+    try {
+      const empUser = await pool.query(
+        "SELECT user_id FROM employee_profiles WHERE id = $1",
+        [application.employee_id]
+      );
+      if (empUser.rows.length > 0) {
+        await NotificationRepository.createNotification({
+          user_id: empUser.rows[0].user_id,
+          title: "Leave Rejected",
+          message: `Your leave request from ${application.from_date.toISOString().split('T')[0]} to ${application.to_date.toISOString().split('T')[0]} has been rejected.`,
+          notification_type: "LEAVE_REJECTION",
+          related_entity_type: "Leave",
+          related_entity_id: id,
+          action_url: `/leave-list`
+        });
+      }
+    } catch (notifErr) {
+      console.error("Notification error (non-fatal):", notifErr.message);
+    }
 
     res.json("Leave Rejected Successfully");
   } catch (error) {

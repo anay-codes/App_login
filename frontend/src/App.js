@@ -15,6 +15,10 @@ import MyProfile from "./pages/MyProfile";
 import LeaveRequests from "./pages/LeaveRequests";
 import LeaveBalance from "./pages/LeaveBalance";
 import ApprovalHistory from "./pages/ApprovalHistory";
+import AssetManagement from "./pages/AssetManagement";
+import Notifications from "./pages/Notifications";
+import AuditLogs from "./pages/AuditLogs";
+import Reports from "./pages/Reports";
 
 function App() {
   return (
@@ -37,6 +41,10 @@ function App() {
         <Route path="/skills" element={<Skills />} />
         <Route path="/leave-application" element={<LeaveApplication />} />
         <Route path="/leave-list" element={<LeaveList />} />
+        <Route path="/assets" element={<AssetManagement />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/audit-logs" element={<AuditLogs />} />
+        <Route path="/reports" element={<Reports />} />
       </Routes>
     </BrowserRouter>
   );
