@@ -39,7 +39,15 @@ function Login() {
       );
 
       localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+      // Save role/profile if provided
+      if (res.data.role) localStorage.setItem("role", res.data.role);
+      if (res.data.profile) localStorage.setItem("profile", JSON.stringify(res.data.profile));
+
+      if (res.data.role === 'Admin') {
+        navigate('/dashboard');
+      } else {
+        navigate('/employee-dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
