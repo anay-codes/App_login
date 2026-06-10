@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
@@ -6,6 +6,7 @@ import "../App.css";
 
 function CreateEmployee() {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -13,9 +14,9 @@ function CreateEmployee() {
   const [profile, setProfile] = useState(null);
   const [resume, setResume] = useState(null);
   const [document, setDocument] = useState(null);
+  const [departments, setDepartments] = useState([]);
 
   const [formData, setFormData] = useState({
-    // user_id removed; admin can provide name/email/password to create associated user
     name: "",
     email: "",
     password: "",
@@ -26,6 +27,21 @@ function CreateEmployee() {
     salary: ""
   });
 
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/departments"
+        );
+        setDepartments(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -35,16 +51,22 @@ function CreateEmployee() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError("");
     setSuccess("");
 
-    // require name,email,password so backend can create user
-    if (!formData.name || !formData.email || !formData.password || !formData.department_id) {
-      setError("Name, email, password and department are required.");
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.department_id
+    ) {
+      setError("Name, Email, Password and Department are required.");
       return;
     }
 
     setLoading(true);
+
     try {
       const uploadData = new FormData();
 
@@ -57,17 +79,27 @@ function CreateEmployee() {
         uploadData
       );
 
-      await axios.post("http://localhost:5000/api/employees", {
-        ...formData,
-        profile_image: uploadResponse.data.profile_image,
-        resume_file: uploadResponse.data.resume_file,
-        document_file: uploadResponse.data.document_file
-      });
+      await axios.post(
+        "http://localhost:5000/api/employees",
+        {
+          ...formData,
+          profile_image: uploadResponse.data.profile_image,
+          resume_file: uploadResponse.data.resume_file,
+          document_file: uploadResponse.data.document_file
+        }
+      );
 
       setSuccess("Employee created successfully!");
-      setTimeout(() => navigate("/employees"), 1500);
+
+      setTimeout(() => {
+        navigate("/employees");
+      }, 1500);
+
     } catch (error) {
-      setError(error.response?.data?.message || "Error creating employee");
+      setError(
+        error.response?.data?.message ||
+        "Error creating employee"
+      );
       console.log(error);
     } finally {
       setLoading(false);
@@ -76,51 +108,69 @@ function CreateEmployee() {
 
   return (
     <div className="layout">
-
       <Sidebar />
+
       <div className="content-wrapper">
 
         <div className="page-header">
           <div>
             <h1 className="page-title">Create Employee</h1>
-            <p className="page-subtitle">Add a new employee to the system</p>
+            <p className="page-subtitle">
+              Add a new employee to the system
+            </p>
           </div>
         </div>
 
-        {success && <div className="alert alert-success">{success}</div>}
-        {error && <div className="alert alert-danger">{error}</div>}
+        {success && (
+          <div className="alert alert-success">
+            {success}
+          </div>
+        )}
+
+        {error && (
+          <div className="alert alert-danger">
+            {error}
+          </div>
+        )}
 
         <div className="card-standard">
-          <form onSubmit={handleSubmit}>
 
-            <div className="form-section">
-              <h5 className="form-section-title">Personal Information</h5>
+          <form onSubmit={handleSubmit}></form>
+
+                      <div className="form-section">
+              <h5 className="form-section-title">
+                Personal Information
+              </h5>
 
               <div className="row">
+
                 <div className="col-md-6">
                   <div className="form-group">
                     <label className="form-label">
-                      Full Name <span className="required">*</span>
+                      Full Name *
                     </label>
+
                     <input
                       className="form-control"
                       name="name"
-                      placeholder="Full name"
+                      placeholder="Full Name"
                       value={formData.name}
                       onChange={handleChange}
                       required
                     />
                   </div>
                 </div>
+
                 <div className="col-md-6">
                   <div className="form-group">
                     <label className="form-label">
-                      Email <span className="required">*</span>
+                      Email *
                     </label>
+
                     <input
                       className="form-control"
-                      name="email"
                       type="email"
+                      name="email"
                       placeholder="Email"
                       value={formData.email}
                       onChange={handleChange}
@@ -128,16 +178,21 @@ function CreateEmployee() {
                     />
                   </div>
                 </div>
+
               </div>
 
               <div className="row">
+
                 <div className="col-md-6">
                   <div className="form-group">
-                    <label className="form-label">Password <span className="required">*</span></label>
+                    <label className="form-label">
+                      Password *
+                    </label>
+
                     <input
                       className="form-control"
-                      name="password"
                       type="password"
+                      name="password"
                       placeholder="Password"
                       value={formData.password}
                       onChange={handleChange}
@@ -145,141 +200,195 @@ function CreateEmployee() {
                     />
                   </div>
                 </div>
+
                 <div className="col-md-6">
                   <div className="form-group">
-                    <label className="form-label">Phone</label>
+                    <label className="form-label">
+                      Phone
+                    </label>
+
                     <input
                       className="form-control"
                       name="phone"
-                      type="tel"
                       placeholder="Phone"
                       value={formData.phone}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
+
               </div>
 
               <div className="form-group">
-                <label className="form-label">Address</label>
+                <label className="form-label">
+                  Address
+                </label>
+
                 <input
                   className="form-control"
                   name="address"
-                  placeholder="Enter employee address"
+                  placeholder="Address"
                   value={formData.address}
                   onChange={handleChange}
                 />
               </div>
+
             </div>
 
             <div className="form-section">
-              <h5 className="form-section-title">Professional Information</h5>
+
+              <h5 className="form-section-title">
+                Professional Information
+              </h5>
 
               <div className="row">
+
                 <div className="col-md-6">
                   <div className="form-group">
                     <label className="form-label">
-                      Department ID <span className="required">*</span>
+                      Department *
                     </label>
-                    <input
+
+                    <select
                       className="form-control"
                       name="department_id"
-                      type="number"
-                      placeholder="Department ID"
                       value={formData.department_id}
                       onChange={handleChange}
                       required
-                    />
+                    >
+                      <option value="">
+                        Select Department
+                      </option>
+
+                      {departments.map((dept) => (
+                        <option
+                          key={dept.id}
+                          value={dept.id}
+                        >
+                          {dept.department_name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
+
                 <div className="col-md-6">
                   <div className="form-group">
-                    <label className="form-label">Designation</label>
+                    <label className="form-label">
+                      Designation
+                    </label>
+
                     <input
                       className="form-control"
                       name="designation"
-                      placeholder="e.g., Senior Developer"
+                      placeholder="e.g. Senior Developer"
                       value={formData.designation}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
+
               </div>
 
               <div className="form-group">
-                <label className="form-label">Salary</label>
+                <label className="form-label">
+                  Salary
+                </label>
+
                 <input
                   className="form-control"
-                  name="salary"
                   type="number"
-                  placeholder="Annual salary"
+                  name="salary"
+                  placeholder="Salary"
                   value={formData.salary}
                   onChange={handleChange}
                 />
               </div>
+
             </div>
 
-            <div className="form-section">
-              <h5 className="form-section-title">Documents & Attachments</h5>
+                        <div className="form-section">
+
+              <h5 className="form-section-title">
+                Documents & Attachments
+              </h5>
 
               <div className="form-group">
-                <label className="form-label">Profile Image</label>
+                <label className="form-label">
+                  Profile Image
+                </label>
+
                 <input
                   type="file"
                   className="form-control"
                   accept="image/*"
-                  onChange={(e) => setProfile(e.target.files[0])}
+                  onChange={(e) =>
+                    setProfile(e.target.files[0])
+                  }
                 />
-                {profile && <p className="form-text">✓ {profile.name}</p>}
               </div>
 
               <div className="form-group">
-                <label className="form-label">Resume</label>
+                <label className="form-label">
+                  Resume
+                </label>
+
                 <input
                   type="file"
                   className="form-control"
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => setResume(e.target.files[0])}
+                  onChange={(e) =>
+                    setResume(e.target.files[0])
+                  }
                 />
-                {resume && <p className="form-text">✓ {resume.name}</p>}
               </div>
 
               <div className="form-group">
-                <label className="form-label">Document</label>
+                <label className="form-label">
+                  Document
+                </label>
+
                 <input
                   type="file"
                   className="form-control"
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => setDocument(e.target.files[0])}
+                  onChange={(e) =>
+                    setDocument(e.target.files[0])
+                  }
                 />
-                {document && <p className="form-text">✓ {document.name}</p>}
               </div>
+
             </div>
 
-            <div className="page-actions" style={{ justifyContent: "flex-end" }}>
+            <div
+              className="page-actions"
+              style={{ justifyContent: "flex-end" }}
+            >
               <button
-                className="btn btn-secondary"
                 type="button"
+                className="btn btn-secondary"
                 onClick={() => navigate("/employees")}
-                disabled={loading}
               >
                 Cancel
               </button>
+
               <button
-                className="btn btn-primary"
                 type="submit"
+                className="btn btn-primary"
                 disabled={loading}
               >
-                {loading ? "Creating..." : "Create Employee"}
+                {loading
+                  ? "Creating..."
+                  : "Create Employee"}
               </button>
             </div>
 
-          </form>
+          </div>
+
         </div>
 
       </div>
 
-    </div>
   );
 }
 

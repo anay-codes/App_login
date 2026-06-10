@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AdminTasks from "./pages/AdminTasks";
+import Tasks from "./pages/Tasks";
 import Login from "./pages/Login";
 import Signup from "./pages/SignupNew";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -45,6 +47,8 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/audit-logs" element={<AuditLogs />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/tasks" element={<Tasks />} />
+        <Route path="/admin-tasks" element={<AdminTasks />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,25 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import NavBar from '../NavBar';
 
-export default function MyProfile(){
-  const profile = JSON.parse(localStorage.getItem('profile') || 'null');
+export default function MyProfile() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/api/employees/me", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProfile(res.data);
+    } catch (error) {
+      setError("Failed to load profile.");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="container">
+    <div>
       <NavBar />
-      <div className="content-wrapper">
-        <div className="card-standard">
-          <h2>My Profile</h2>
-          {profile ? (
-            <div>
-              <p><strong>Name:</strong> {profile.name}</p>
-              <p><strong>Phone:</strong> {profile.phone}</p>
-              <p><strong>Address:</strong> {profile.address}</p>
-              <p><strong>Designation:</strong> {profile.designation}</p>
+      <div style={{ padding: "32px" }}>
+        {loading && <p>Loading...</p>}
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {profile && (
+          <div className="card-standard" style={{ maxWidth: "600px" }}>
+            <h2 style={{ marginBottom: "24px" }}>My Profile</h2>
+
+            <div className="form-section">
+              <h5 className="form-section-title">Personal Information</h5>
+              <p><strong>Name:</strong> {profile.name || "—"}</p>
+              <p><strong>Email:</strong> {profile.email || "—"}</p>
+              <p><strong>Phone:</strong> {profile.phone || "—"}</p>
+              <p><strong>Address:</strong> {profile.address || "—"}</p>
             </div>
-          ) : (
-            <p>No profile data available.</p>
-          )}
-        </div>
+
+            <div className="form-section">
+              <h5 className="form-section-title">Professional Information</h5>
+              <p><strong>Designation:</strong> {profile.designation || "—"}</p>
+              <p><strong>Salary:</strong> {profile.salary ? `$${profile.salary}` : "—"}</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

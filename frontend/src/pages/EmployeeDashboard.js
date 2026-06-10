@@ -30,6 +30,7 @@ export default function EmployeeDashboard(){
           <StatCard title="Requests" subtitle="Leave Requests" to="/leave-requests" />
           <StatCard title="Balance" subtitle="Leave Balance" to="/leave-balance" />
           <StatCard title="History" subtitle="Approval History" to="/approval-history" />
+          <StatCard title="Tasks" subtitle="My Tasks" to="/tasks" />
         </div>
 
       </div>

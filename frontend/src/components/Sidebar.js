@@ -31,6 +31,7 @@ export default function Sidebar() {
     { label: "Notifications", route: "/notifications" },
     { label: "Audit Logs", route: "/audit-logs" },
     { label: "Reports", route: "/reports" },
+    { label: "Tasks", route: "/admin-tasks" },
   ];
 
   return (

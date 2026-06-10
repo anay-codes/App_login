@@ -16,6 +16,41 @@ router.get("/leave-types", async (req, res) => {
   }
 });
 
+// Get leave balance for employee
+router.get("/balance/:employee_id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT lb.*, lt.leave_name
+       FROM leave_balance lb
+       INNER JOIN leave_types lt ON lb.leave_type_id = lt.id
+       WHERE lb.employee_id = $1`,
+      [req.params.employee_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Server Error");
+  }
+});
+
+// Get my leave history
+router.get("/my/:employee_id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT la.*, lt.leave_name
+       FROM leave_applications la
+       INNER JOIN leave_types lt ON la.leave_type_id = lt.id
+       WHERE la.employee_id = $1
+       ORDER BY la.created_at DESC`,
+      [req.params.employee_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Server Error");
+  }
+});
+
 // Get all leave applications
 router.get("/", async (req, res) => {
   try {

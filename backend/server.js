@@ -15,6 +15,7 @@ const notificationRoutes = require("./routes/notifications");
 const auditRoutes        = require("./routes/audit");
 const reportRoutes       = require("./routes/reports");
 const { errorHandler }   = require("./middleware/errorHandler");
+const taskRoutes = require("./routes/tasks");
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/assets",        assetRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/audit",         auditRoutes);
 app.use("/api/reports",       reportRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // Global error handler (must be last)
 app.use(errorHandler);
