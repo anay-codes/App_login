@@ -8,6 +8,7 @@ export default function Sidebar() {
   const path = location.pathname;
 
   const isActive = (route) => {
+    if (!route) return false;
     if (route === "/dashboard") return path === "/dashboard";
     return path.startsWith(route);
   };
@@ -20,6 +21,7 @@ export default function Sidebar() {
   };
 
   const navItems = [
+    { label: "🏠 Home", to: "/login" },                    // Fixed
     { label: "Dashboard", route: "/dashboard" },
     { label: "Create Employee", route: "/create-employee" },
     { label: "Employee List", route: "/employees" },
@@ -29,6 +31,7 @@ export default function Sidebar() {
     { label: "Manage Leaves", route: "/leave-list" },
     { label: "Assets", route: "/assets" },
     { label: "Notifications", route: "/notifications" },
+    { label: "Attendance", route: "/attendance" },         // ← New
     { label: "Audit Logs", route: "/audit-logs" },
     { label: "Reports", route: "/reports" },
     { label: "Tasks", route: "/admin-tasks" },
@@ -38,11 +41,11 @@ export default function Sidebar() {
     <div className="sidebar">
       <h3 className="sidebar-title">EMS</h3>
       <div className="sidebar-nav">
-        {navItems.map((item) => (
+        {navItems.map((item, index) => (
           <button
-            key={item.route}
-            className={`sidebar-btn${isActive(item.route) ? " active" : ""}`}
-            onClick={() => navigate(item.route)}
+            key={index}
+            className={`sidebar-btn${isActive(item.route || item.to) ? " active" : ""}`}
+            onClick={() => navigate(item.to || item.route)}
           >
             {item.label}
           </button>

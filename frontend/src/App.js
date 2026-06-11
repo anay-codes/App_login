@@ -21,6 +21,10 @@ import AssetManagement from "./pages/AssetManagement";
 import Notifications from "./pages/Notifications";
 import AuditLogs from "./pages/AuditLogs";
 import Reports from "./pages/Reports";
+import MyAssets from "./pages/MyAssets";
+import EmployeeNotifications from './pages/EmployeeNotifications';
+import MarkAttendance from './pages/MarkAttendance';
+import AdminAttendance from './pages/AdminAttendance';
 
 function App() {
   return (
@@ -49,6 +53,10 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/admin-tasks" element={<AdminTasks />} />
+        <Route path="/my-assets" element={<MyAssets />} />
+        <Route path="/employee-notifications" element={<EmployeeNotifications />} />
+        <Route path="/mark-attendance" element={<MarkAttendance />} />
+        <Route path="/attendance" element={<AdminAttendance />} />
       </Routes>
     </BrowserRouter>
   );

@@ -67,4 +67,32 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// POST /api/notifications/broadcast  (admin sends to all employees)
+router.post("/broadcast", async (req, res) => {
+  try {
+    const { title, message } = req.body;
+    if (!title || !message) 
+      return res.status(400).json({ success: false, message: "title and message required" });
+
+    const employees = await require("../config/db").query(
+      "SELECT user_id FROM employee_profiles"
+    );
+
+    const promises = employees.rows.map(emp =>
+      NotificationService.sendNotification({
+        user_id: emp.user_id,
+        title,
+        message,
+        notification_type: "GENERAL"
+      })
+    );
+
+    await Promise.all(promises);
+    res.json({ success: true, message: "Notification sent to all employees" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

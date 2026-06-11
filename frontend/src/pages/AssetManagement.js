@@ -73,22 +73,27 @@ export default function AssetManagement() {
   };
 
   const saveAsset = async (e) => {
-    e.preventDefault();
-    try {
-      if (currentAsset) {
-        await axios.put(`http://localhost:5000/api/assets/${currentAsset.id}`, assetForm);
-        alert("Asset updated successfully");
-      } else {
-        await axios.post("http://localhost:5000/api/assets", assetForm);
-        alert("Asset created successfully");
-      }
-      setShowAssetModal(false);
-      setCurrentAsset(null);
-      loadData();
-    } catch (err) {
-      alert("Error saving asset: " + (err.response?.data?.message || err.message));
+  e.preventDefault();
+  try {
+    const payload = {
+      ...assetForm,
+      purchase_date: assetForm.purchase_date || null,
+      purchase_cost: assetForm.purchase_cost || null,
+    };
+    if (currentAsset) {
+      await axios.put(`http://localhost:5000/api/assets/${currentAsset.id}`, payload);
+      alert("Asset updated successfully");
+    } else {
+      await axios.post("http://localhost:5000/api/assets", payload);
+      alert("Asset created successfully");
     }
-  };
+    setShowAssetModal(false);
+    setCurrentAsset(null);
+    loadData();
+  } catch (err) {
+    alert("Error saving asset: " + (err.response?.data?.message || err.message));
+  }
+};
 
   const deleteAsset = async (id) => {
     if (!window.confirm("Are you sure you want to delete this asset?")) return;

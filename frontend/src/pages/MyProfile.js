@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import NavBar from '../NavBar';
+import EmployeeSidebar from "../components/EmployeeSidebar";
 
 export default function MyProfile() {
   const [profile, setProfile] = useState(null);
@@ -26,10 +26,11 @@ export default function MyProfile() {
     }
   };
 
-  return (
-    <div>
-      <NavBar />
-      <div style={{ padding: "32px" }}>
+ return (
+  <div className="dashboard-layout">
+    <EmployeeSidebar />
+
+    <div className="dashboard-content">
         {loading && <p>Loading...</p>}
         {error && <div className="alert alert-danger">{error}</div>}
 

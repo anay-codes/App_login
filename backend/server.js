@@ -36,6 +36,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/audit",         auditRoutes);
 app.use("/api/reports",       reportRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use('/api/attendance', require('./routes/attendance'));
 
 // Global error handler (must be last)
 app.use(errorHandler);
