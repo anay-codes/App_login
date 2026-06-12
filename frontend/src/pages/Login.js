@@ -1,192 +1,57 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import "../App.css";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
-function Login() {
-const [form, setForm] = useState({
-email: "",
-password: ""
-});
+export default function Login() {
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-const [showPassword, setShowPassword] = useState(false);
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState("");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!form.email.trim() || !form.password) return setError("Enter your email and password.");
+    setLoading(true);
+    setError("");
+    try {
+      const { data } = await axios.post("/api/auth/login", form);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("profile", JSON.stringify(data.profile || {}));
+      const requested = location.state?.from?.pathname;
+      navigate(requested || (data.role === "Admin" ? "/dashboard" : "/employee-dashboard"), { replace: true });
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Login failed. Check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const navigate = useNavigate();
-
-const handleChange = (e) => {
-setForm({
-...form,
-[e.target.name]: e.target.value
-});
-setError("");
-};
-
-const handleSubmit = async (e) => {
-e.preventDefault();
-setLoading(true);
-setError ("");
-
-
-if (!form.email || !form.password) {
-  setError("Please enter both email and password");
-  setLoading(false);
-  return;
-}
-
-try {
-  const res = await axios.post(
-    "http://localhost:5000/api/auth/login",
-    form
-  );
-
-  localStorage.setItem("token", res.data.token);
-
-  if (res.data.role) {
-    localStorage.setItem("role", res.data.role);
-  }
-
-  if (res.data.profile) {
-    localStorage.setItem(
-      "profile",
-      JSON.stringify(res.data.profile)
-    );
-  }
-
-  if (res.data.role === "Admin") {
-    navigate("/dashboard");
-  } else {
-    navigate("/employee-dashboard");
-  }
-
-} catch (err) {
-  setError(
-    err.response?.data?.message ||
-    "Login failed. Please check your credentials."
-  );
-} finally {
-  setLoading(false);
-}
-
-
-};
-
-return ( <div className="container"> <div className="row vh-100 justify-content-center align-items-center"> <div className="col-md-5 col-sm-10">
-
-
-      <div className="card-standard">
-
-        <h2
-          className="text-center mb-4"
-          style={{
-            fontSize: "28px",
-            fontWeight: "700"
-          }}
-        >
-          Welcome Back
-        </h2>
-
-        {error && (
-          <div className="alert alert-danger">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-
-          <div className="form-group">
-            <label className="form-label">
-              Email
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              placeholder="Enter your email"
-              value={form.email}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Password
-            </label>
-
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              className="form-control"
-              placeholder="Enter your password"
-              value={form.password}
-              onChange={handleChange}
-              disabled={loading}
-            />
-
-            <div className="mt-2">
-              <input
-                type="checkbox"
-                id="showPassword"
-                checked={showPassword}
-                onChange={() =>
-                  setShowPassword(!showPassword)
-                }
-              />
-
-              <label
-                htmlFor="showPassword"
-                style={{
-                  marginLeft: "8px",
-                  fontSize: "14px"
-                }}
-              >
-                Show Password
-              </label>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="btn btn-primary w-100"
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-        </form>
-
-        <hr style={{ margin: "20px 0" }} />
-
-        <div className="text-center mb-3">
-          <Link
-            to="/forgot-password"
-            style={{
-              color: "#2563eb",
-              textDecoration: "none"
-            }}
-          >
-            Forgot Password?
-          </Link>
-        </div>
-
-        <Link
-          to="/signup"
-          className="btn btn-success w-100"
-        >
-          Register as Employee
-        </Link>
-
+  return (
+    <div className="auth-page">
+      <div className="auth-brand-panel">
+        <Link className="brand" to="/">Workforce EMS</Link>
+        <div><span className="eyebrow">Secure employee operations</span><h1>Welcome back to your workforce workspace.</h1><p>Access attendance, leave, tasks, assets, reports, and employee operations from one reliable system.</p></div>
       </div>
-
+      <main className="auth-form-panel">
+        <div className="auth-toolbar"><ThemeToggle /></div>
+        <div className="auth-card">
+          <span className="eyebrow">Account access</span>
+          <h2>Sign in</h2>
+          <p className="page-subtitle">Use your registered work account.</p>
+          {error && <div className="alert alert-danger">{error}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group"><label className="form-label" htmlFor="email">Email address</label><input id="email" type="email" className="form-control" autoComplete="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} disabled={loading} /></div>
+            <div className="form-group"><label className="form-label" htmlFor="password">Password</label><input id="password" type={showPassword ? "text" : "password"} className="form-control" autoComplete="current-password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} disabled={loading} /></div>
+            <label className="form-check-label auth-check"><input type="checkbox" className="form-check-input" checked={showPassword} onChange={() => setShowPassword((value) => !value)} /> Show password</label>
+            <button type="submit" className="btn btn-primary w-100" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</button>
+          </form>
+          <div className="auth-links"><Link to="/forgot-password">Forgot password?</Link><span>New employee? <Link to="/signup">Create an account</Link></span></div>
+        </div>
+      </main>
     </div>
-  </div>
-</div>
-
-
-);
+  );
 }
-
-export default Login;

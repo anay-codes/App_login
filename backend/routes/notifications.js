@@ -1,12 +1,26 @@
 const express = require("express");
 const router  = express.Router();
 const NotificationService = require("../services/NotificationService");
+const pool = require("../config/db");
+
+const canAccessUser = (req, userId) =>
+  req.user.role === "Admin" || Number(req.user.id) === Number(userId);
+
+const canAccessNotification = async (req, notificationId) => {
+  if (req.user.role === "Admin") return true;
+  const result = await pool.query(
+    "SELECT user_id FROM notifications WHERE id = $1",
+    [notificationId]
+  );
+  return result.rows[0]?.user_id === req.user.id;
+};
 
 // ── GET /api/notifications?user_id=&limit=&offset=
 router.get("/", async (req, res) => {
   try {
     const { user_id, limit = 20, offset = 0 } = req.query;
     if (!user_id) return res.status(400).json({ success: false, message: "user_id required" });
+    if (!canAccessUser(req, user_id)) return res.status(403).json({ success: false, message: "Access denied" });
     const notifications = await NotificationService.getNotifications(
       parseInt(user_id),
       parseInt(limit),
@@ -24,6 +38,7 @@ router.get("/unread-count", async (req, res) => {
   try {
     const { user_id } = req.query;
     if (!user_id) return res.status(400).json({ success: false, message: "user_id required" });
+    if (!canAccessUser(req, user_id)) return res.status(403).json({ success: false, message: "Access denied" });
     const count = await NotificationService.getUnreadCount(parseInt(user_id));
     res.json({ success: true, count });
   } catch (err) {
@@ -35,6 +50,9 @@ router.get("/unread-count", async (req, res) => {
 // ── PUT /api/notifications/:id/read
 router.put("/:id/read", async (req, res) => {
   try {
+    if (!(await canAccessNotification(req, req.params.id))) {
+      return res.status(403).json({ success: false, message: "Access denied" });
+    }
     const notification = await NotificationService.markAsRead(req.params.id);
     res.json({ success: true, message: "Marked as read", data: notification });
   } catch (err) {
@@ -48,6 +66,7 @@ router.put("/mark-all-read", async (req, res) => {
   try {
     const { user_id } = req.body;
     if (!user_id) return res.status(400).json({ success: false, message: "user_id required" });
+    if (!canAccessUser(req, user_id)) return res.status(403).json({ success: false, message: "Access denied" });
     await NotificationService.markAllAsRead(parseInt(user_id));
     res.json({ success: true, message: "All notifications marked as read" });
   } catch (err) {
@@ -59,6 +78,9 @@ router.put("/mark-all-read", async (req, res) => {
 // ── DELETE /api/notifications/:id
 router.delete("/:id", async (req, res) => {
   try {
+    if (!(await canAccessNotification(req, req.params.id))) {
+      return res.status(403).json({ success: false, message: "Access denied" });
+    }
     await NotificationService.deleteNotification(req.params.id);
     res.json({ success: true, message: "Notification deleted" });
   } catch (err) {
@@ -70,11 +92,14 @@ router.delete("/:id", async (req, res) => {
 // POST /api/notifications/broadcast  (admin sends to all employees)
 router.post("/broadcast", async (req, res) => {
   try {
+    if (req.user.role !== "Admin") {
+      return res.status(403).json({ success: false, message: "Access denied" });
+    }
     const { title, message } = req.body;
     if (!title || !message) 
       return res.status(400).json({ success: false, message: "title and message required" });
 
-    const employees = await require("../config/db").query(
+    const employees = await pool.query(
       "SELECT DISTINCT user_id FROM employee_profiles WHERE user_id IS NOT NULL"
     );
 

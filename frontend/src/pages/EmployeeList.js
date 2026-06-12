@@ -12,7 +12,7 @@ function EmployeeList() {
   const deleteEmployee = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/employees/${id}`
+        `https://app-login-po50.onrender.com/api/employees/${id}`
       );
       loadEmployees();
     } catch (error) {
@@ -28,7 +28,7 @@ function EmployeeList() {
     setLoading(true);
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/employees"
+        "https://app-login-po50.onrender.com/api/employees"
       );
       setEmployees(res.data);
     } catch (error) {
@@ -108,7 +108,7 @@ function EmployeeList() {
                       <td>
                         {emp.profile_image ? (
                           <img
-                            src={`http://localhost:5000/uploads/${emp.profile_image}`}
+                            src={`https://app-login-po50.onrender.com/uploads/${emp.profile_image}`}
                             alt="profile"
                             className="table-image"
                           />
@@ -127,7 +127,7 @@ function EmployeeList() {
                       <td>
                         {emp.resume_file ? (
                           <a
-                            href={`http://localhost:5000/uploads/${emp.resume_file}`}
+                            href={`https://app-login-po50.onrender.com/uploads/${emp.resume_file}`}
                             target="_blank"
                             rel="noreferrer"
                             className="btn btn-primary btn-sm"
@@ -142,7 +142,7 @@ function EmployeeList() {
                       <td>
                         {emp.document_file ? (
                           <a
-                            href={`http://localhost:5000/uploads/${emp.document_file}`}
+                            href={`https://app-login-po50.onrender.com/uploads/${emp.document_file}`}
                             target="_blank"
                             rel="noreferrer"
                             className="btn btn-secondary btn-sm"

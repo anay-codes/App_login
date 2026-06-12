@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../App.css";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ export default function Sidebar() {
         <button className="sidebar-btn logout-btn" onClick={logout}>
           Logout
         </button>
+        <ThemeToggle />
       </div>
     </div>
   );

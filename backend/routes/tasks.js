@@ -1,15 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
-const jwt = require("jsonwebtoken");
-
-const getUser = (req) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  return jwt.verify(token, process.env.JWT_SECRET);
-};
+const { authorize } = require("../middleware/auth");
 
 // Admin - Get all tasks
-router.get("/", async (req, res) => {
+router.get("/", authorize("Admin"), async (req, res) => {
   try {
     const tasks = await pool.query(
       `SELECT t.*, u.name AS assigned_to_name
@@ -27,10 +22,9 @@ router.get("/", async (req, res) => {
 // Employee - Get my tasks
 router.get("/my", async (req, res) => {
   try {
-    const decoded = getUser(req);
     const tasks = await pool.query(
       `SELECT * FROM tasks WHERE assigned_to = $1 ORDER BY created_at DESC`,
-      [decoded.id]
+      [req.user.id]
     );
     res.json(tasks.rows);
   } catch (error) {
@@ -40,15 +34,17 @@ router.get("/my", async (req, res) => {
 });
 
 // Admin - Create task
-router.post("/", async (req, res) => {
+router.post("/", authorize("Admin"), async (req, res) => {
   try {
-    const decoded = getUser(req);
     const { title, description, assigned_to } = req.body;
+    if (!title || !assigned_to) {
+      return res.status(400).json({ message: "title and assigned_to are required" });
+    }
 
     const task = await pool.query(
       `INSERT INTO tasks (title, description, assigned_to, created_by)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [title, description || null, assigned_to, decoded.id]
+      [title, description || null, assigned_to, req.user.id]
     );
     res.json(task.rows[0]);
   } catch (error) {
@@ -58,12 +54,15 @@ router.post("/", async (req, res) => {
 });
 
 // Employee - Mark task as done
-router.put("/:id/done", async (req, res) => {
+router.put("/:id/done", authorize("Employee"), async (req, res) => {
   try {
-    await pool.query(
-      `UPDATE tasks SET status = 'done' WHERE id = $1`,
-      [req.params.id]
+    const result = await pool.query(
+      `UPDATE tasks SET status = 'done' WHERE id = $1 AND assigned_to = $2 RETURNING id`,
+      [req.params.id, req.user.id]
     );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Task not found" });
+    }
     res.json("Task marked as done");
   } catch (error) {
     console.error(error);
@@ -72,7 +71,7 @@ router.put("/:id/done", async (req, res) => {
 });
 
 // Admin - Delete task
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authorize("Admin"), async (req, res) => {
   try {
     await pool.query("DELETE FROM tasks WHERE id = $1", [req.params.id]);
     res.json("Task Deleted");

@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
+const { authorize } = require("../middleware/auth");
 
 // Create Employee
-router.post("/", async (req, res) => {
+router.post("/", authorize("Admin"), async (req, res) => {
   const client = await pool.connect();
 
   try {
@@ -85,7 +86,7 @@ router.post("/", async (req, res) => {
 });
 
 // Get Employees
-router.get("/", async (req, res) => {
+router.get("/", authorize("Admin"), async (req, res) => {
   try {
     const employees = await pool.query(
       `SELECT
@@ -120,15 +121,12 @@ router.get("/", async (req, res) => {
 // Get My Profile (Employee)
 router.get("/me", async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    const decoded = require("jsonwebtoken").verify(token, process.env.JWT_SECRET);
-
     const employee = await pool.query(
       `SELECT ep.*, u.name, u.email
        FROM employee_profiles ep
        INNER JOIN users u ON ep.user_id = u.id
        WHERE ep.user_id = $1`,
-      [decoded.id]
+      [req.user.id]
     );
 
     res.json(employee.rows[0]);
@@ -139,7 +137,7 @@ router.get("/me", async (req, res) => {
 });
 
 // Get Single Employee
-router.get("/:id", async (req, res) => {
+router.get("/:id", authorize("Admin"), async (req, res) => {
   try {
     const employee = await pool.query(
       `SELECT ep.*, u.name, u.email
@@ -158,7 +156,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update Employee
-router.put("/:id", async (req, res) => {
+router.put("/:id", authorize("Admin"), async (req, res) => {
   const client = await pool.connect();
 
   try {
@@ -182,6 +180,10 @@ router.put("/:id", async (req, res) => {
       [req.params.id]
     );
 
+    if (employeeRes.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Employee not found" });
+    }
     const userId = employeeRes.rows[0].user_id;
 
     await client.query(
@@ -227,7 +229,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete Employee
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authorize("Admin"), async (req, res) => {
   try {
     await pool.query(
       "DELETE FROM employee_profiles WHERE id = $1",

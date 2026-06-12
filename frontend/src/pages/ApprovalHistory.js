@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import NavBar from "../NavBar";
+import EmployeeLayout from "../components/EmployeeLayout";
 
 export default function ApprovalHistory() {
   const [leaves, setLeaves] = useState([]);
@@ -18,7 +18,7 @@ export default function ApprovalHistory() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/leaves/my/${employee_id}`
+        `https://app-login-po50.onrender.com/api/leaves/my/${employee_id}`
       );
       setLeaves(res.data);
     } catch (error) {
@@ -32,9 +32,7 @@ export default function ApprovalHistory() {
   const formatDate = (d) => d ? new Date(d).toLocaleDateString() : "—";
 
   return (
-    <div>
-      <NavBar />
-      <div style={{ padding: "32px" }}>
+    <EmployeeLayout>
         <div className="page-header">
           <div>
             <h1 className="page-title">Approval History</h1>
@@ -93,7 +91,6 @@ export default function ApprovalHistory() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </EmployeeLayout>
   );
 }

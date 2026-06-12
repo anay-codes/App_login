@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import NavBar from "../NavBar";
+import EmployeeLayout from "../components/EmployeeLayout";
 
 export default function LeaveBalance() {
   const [balances, setBalances] = useState([]);
@@ -18,7 +18,7 @@ export default function LeaveBalance() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/leaves/balance/${employee_id}`
+        `https://app-login-po50.onrender.com/api/leaves/balance/${employee_id}`
       );
       setBalances(res.data);
     } catch (error) {
@@ -30,9 +30,7 @@ export default function LeaveBalance() {
   };
 
   return (
-    <div>
-      <NavBar />
-      <div style={{ padding: "32px" }}>
+    <EmployeeLayout>
         <div className="page-header">
           <div>
             <h1 className="page-title">Leave Balance</h1>
@@ -62,7 +60,6 @@ export default function LeaveBalance() {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </EmployeeLayout>
   );
 }

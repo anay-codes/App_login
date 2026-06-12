@@ -55,7 +55,15 @@ class AssetAllocationRepository {
 
   async getAllAllocations(limit = 100, offset = 0) {
     const result = await pool.query(
-      `SELECT * FROM active_allocations_view 
+      `SELECT aa.id, aa.employee_id, aa.asset_id, a.asset_name, a.asset_type,
+              a.serial_number, u.name AS employee_name, u.email, ep.designation,
+              d.department_name, aa.allocated_date, aa.condition_on_allocation, aa.notes
+       FROM asset_allocations aa
+       JOIN assets a ON aa.asset_id = a.id
+       JOIN employee_profiles ep ON aa.employee_id = ep.id
+       JOIN users u ON ep.user_id = u.id
+       LEFT JOIN departments d ON ep.department_id = d.id
+       WHERE aa.is_active = TRUE AND aa.returned_date IS NULL
        ORDER BY allocated_date DESC
        LIMIT $1 OFFSET $2`,
       [limit, offset]

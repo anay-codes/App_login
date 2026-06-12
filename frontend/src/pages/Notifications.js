@@ -19,7 +19,7 @@ export default function Notifications() {
   const loadNotifications = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/notifications?user_id=${userId}`);
+      const res = await axios.get(`https://app-login-po50.onrender.com/api/notifications?user_id=${userId}`);
       setNotifications(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -49,7 +49,7 @@ export default function Notifications() {
         setShowModal(false);
         return;
       }
-      await axios.post("http://localhost:5000/api/notifications/broadcast", form);
+      await axios.post("https://app-login-po50.onrender.com/api/notifications/broadcast", form);
       alert("Notification sent to all employees");
       setShowModal(false);
       loadNotifications();
@@ -60,7 +60,7 @@ export default function Notifications() {
 
   const markAllAsRead = async () => {
     try {
-      await axios.put("http://localhost:5000/api/notifications/mark-all-read", { user_id: userId });
+      await axios.put("https://app-login-po50.onrender.com/api/notifications/mark-all-read", { user_id: userId });
       loadNotifications();
     } catch (err) {
       alert("Error marking all as read");
@@ -69,7 +69,7 @@ export default function Notifications() {
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/notifications/${id}/read`);
+      await axios.put(`https://app-login-po50.onrender.com/api/notifications/${id}/read`);
       loadNotifications();
     } catch (err) {
       alert("Error marking as read");
@@ -79,7 +79,7 @@ export default function Notifications() {
   const deleteNotification = async (id) => {
     if (!window.confirm("Delete this notification?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/notifications/${id}`);
+      await axios.delete(`https://app-login-po50.onrender.com/api/notifications/${id}`);
       loadNotifications();
     } catch (err) {
       alert("Error deleting notification");

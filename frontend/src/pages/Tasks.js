@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import NavBar from "../NavBar";
+import EmployeeLayout from "../components/EmployeeLayout";
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
@@ -15,7 +15,7 @@ export default function Tasks() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/tasks/my", {
+      const res = await axios.get("https://app-login-po50.onrender.com/api/tasks/my", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(res.data);
@@ -29,7 +29,7 @@ export default function Tasks() {
   const markDone = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/tasks/${id}/done`, {}, {
+      await axios.put(`https://app-login-po50.onrender.com/api/tasks/${id}/done`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess("Task marked as done!");
@@ -40,9 +40,7 @@ export default function Tasks() {
   };
 
   return (
-    <div>
-      <NavBar />
-      <div style={{ padding: "32px" }}>
+    <EmployeeLayout>
         <div className="page-header">
           <div>
             <h1 className="page-title">My Tasks</h1>
@@ -106,7 +104,6 @@ export default function Tasks() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </EmployeeLayout>
   );
 }

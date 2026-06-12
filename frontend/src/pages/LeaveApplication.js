@@ -40,7 +40,7 @@ function LeaveApplication() {
 
   const loadEmployees = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/employees");
+      const res = await axios.get("https://app-login-po50.onrender.com/api/employees");
       setEmployees(res.data);
     } catch (err) {
       console.error("Error loading employees", err);
@@ -50,7 +50,7 @@ function LeaveApplication() {
 
   const loadLeaveTypes = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaves/leave-types");
+      const res = await axios.get("https://app-login-po50.onrender.com/api/leaves/leave-types");
       setLeaveTypes(res.data);
       setLoading(false);
     } catch (err) {
@@ -84,7 +84,7 @@ function LeaveApplication() {
 
     setSubmitting(true);
     try {
-      await axios.post("http://localhost:5000/api/leaves/apply", {
+      await axios.post("https://app-login-po50.onrender.com/api/leaves/apply", {
         employee_id: parseInt(formData.employee_id),
         leave_type_id: parseInt(formData.leave_type_id),
         from_date: formData.from_date,

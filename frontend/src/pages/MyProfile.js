@@ -14,7 +14,7 @@ export default function MyProfile() {
   const loadProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/employees/me", {
+      const res = await axios.get("https://app-login-po50.onrender.com/api/employees/me", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(res.data);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import NavBar from '../NavBar';
+import EmployeeLayout from '../components/EmployeeLayout';
 
 export default function MyAssets() {
   const [assets, setAssets] = useState([]);
@@ -11,11 +11,10 @@ export default function MyAssets() {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/assets/allocations`, {
+        const res = await axios.get(`/api/assets/allocations?employee_id=${profile.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const myAssets = res.data.data.filter(a => a.employee_id === profile.id);
-        setAssets(myAssets);
+        setAssets(res.data.data || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -26,10 +25,8 @@ export default function MyAssets() {
   }, []);
 
   return (
-    <>
-      <NavBar />
-      <div className="container mt-4">
-        <h3>My Assets</h3>
+    <EmployeeLayout>
+      <div className="page-header"><div><h1 className="page-title">My Assets</h1><p className="page-subtitle">Equipment currently allocated to you.</p></div></div>
         {loading ? (
           <div className="spinner-border text-primary mt-3" role="status"></div>
         ) : (
@@ -61,7 +58,6 @@ export default function MyAssets() {
             </tbody>
           </table>
         )}
-      </div>
-    </>
+    </EmployeeLayout>
   );
 }
