@@ -62,8 +62,8 @@ class NotificationRepository {
   }
 
   async deleteNotification(id) {
-    await pool.query("DELETE FROM notifications WHERE id = $1", [id]);
-    return true;
+    const result = await pool.query("DELETE FROM notifications WHERE id = $1 RETURNING id", [id]);
+    return result.rows[0];
   }
 
   async getNotificationPreferences(userId) {

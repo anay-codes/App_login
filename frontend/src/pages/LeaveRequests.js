@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import NavBar from "../NavBar";
+import EmployeeSidebar from "../components/EmployeeSidebar";
 
 export default function LeaveRequests() {
   const [leaveTypes, setLeaveTypes] = useState([]);
@@ -56,11 +56,10 @@ export default function LeaveRequests() {
     }
   };
 
-  return (
-    <div>
-      <NavBar />
-      <div style={{ padding: "32px" }}>
-        <div className="page-header">
+ return (
+  <div className="dashboard-layout">
+    <EmployeeSidebar/>
+    <div className="dashboard-content">
           <div>
             <h1 className="page-title">Apply for Leave</h1>
             <p className="page-subtitle">Submit a new leave request</p>
@@ -139,6 +138,5 @@ export default function LeaveRequests() {
           </form>
         </div>
       </div>
-    </div>
   );
 }

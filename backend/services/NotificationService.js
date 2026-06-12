@@ -11,7 +11,9 @@ class NotificationService {
   }
 
   async markAsRead(notificationId) {
-    return await NotificationRepository.markAsRead(notificationId);
+    const notification = await NotificationRepository.markAsRead(notificationId);
+    if (!notification) throw new Error("Notification not found");
+    return notification;
   }
 
   async markAllAsRead(userId) {
@@ -19,7 +21,9 @@ class NotificationService {
   }
 
   async deleteNotification(id) {
-    return await NotificationRepository.deleteNotification(id);
+    const notification = await NotificationRepository.deleteNotification(id);
+    if (!notification) throw new Error("Notification not found");
+    return notification;
   }
 
   async getPreferences(userId) {

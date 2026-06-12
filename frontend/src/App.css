@@ -40,6 +40,277 @@ body {
   background: var(--light-bg);
 }
 
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--light-bg);
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 28px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.dashboard-panel {
+  grid-column: span 6;
+}
+
+.dashboard-panel-wide {
+  grid-column: span 8;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 20px;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.metric-card span {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.metric-card strong {
+  color: var(--text-primary);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.metric-card small {
+  color: var(--text-secondary);
+}
+
+.chart-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.donut-chart {
+  width: 150px;
+  height: 150px;
+  flex: 0 0 150px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(var(--primary) var(--value), #e5e7eb 0);
+  position: relative;
+}
+
+.donut-chart::after {
+  content: "";
+  position: absolute;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+.donut-chart span {
+  position: relative;
+  z-index: 1;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dashboard-value {
+  margin: 0 0 6px;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.legend-dot:first-child {
+  margin-left: 0;
+}
+
+.legend-dot.success { background: var(--success); }
+.legend-dot.warning { background: var(--warning); }
+
+.bar-stat {
+  margin-bottom: 20px;
+}
+
+.bar-stat > div:first-child,
+.compact-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+}
+
+.progress-value.success { background: var(--success); }
+.progress-value.warning { background: var(--warning); }
+.progress-value.danger { background: var(--danger); }
+
+.compact-stat {
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.compact-stat:last-child {
+  border-bottom: 0;
+}
+
+.compact-stat strong {
+  font-size: 20px;
+}
+
+.quick-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quick-action-grid a {
+  padding: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.quick-action-grid a:hover {
+  color: var(--primary);
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.attendance-card {
+  max-width: 620px;
+  margin: 32px auto 0;
+  padding: 48px;
+  text-align: center;
+}
+
+.attendance-card h2 {
+  margin: 22px 0 8px;
+  font-size: 24px;
+}
+
+.attendance-card .btn {
+  margin-top: 24px;
+}
+
+.attendance-time {
+  margin: 4px 0 0;
+  color: var(--text-primary);
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-pill.success { color: #047857; background: #d1fae5; }
+.status-pill.warning { color: #92400e; background: #fef3c7; }
+.status-pill.danger { color: #b91c1c; background: #fee2e2; }
+.status-pill.neutral { color: #475569; background: #e2e8f0; }
+
+.attendance-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attendance-actions .form-select {
+  min-width: 120px;
+}
+
+.date-filter {
+  width: auto;
+}
+
+.table-message {
+  padding: 40px !important;
+  text-align: center;
+  color: var(--text-secondary) !important;
+}
+
+.notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notification-item:last-child {
+  border-bottom: 0;
+}
+
+.notification-item.unread {
+  border-left: 3px solid var(--primary);
+  padding-left: 14px;
+}
+
 .sidebar {
   width: 260px;
   background: var(--dark-sidebar);
@@ -603,13 +874,41 @@ body {
   }
 
   .layout,
-  .dashboard-layout {
+  .dashboard-layout,
+  .app-shell {
     flex-direction: column;
   }
 
   .content-wrapper,
-  .dashboard-content {
+  .dashboard-content,
+  .app-content {
     padding: 20px 16px;
+  }
+
+  .dashboard-panel {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-panel-wide {
+    grid-column: 1 / -1;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chart-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .quick-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .sidebar-nav {
@@ -704,6 +1003,14 @@ body {
 }
 
 @media (max-width: 576px) {
+  .metric-grid,
+  .quick-action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-card {
+    padding: 28px 18px;
+  }
   .btn {
     padding: 8px 12px;
     font-size: 12px;

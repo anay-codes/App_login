@@ -1,136 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Sidebar from '../components/Sidebar';
+import React, { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import AdminLayout from "../components/AdminLayout";
 
-const AdminAttendance = () => {
+export default function AdminAttendance() {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+  const [error, setError] = useState("");
+  const [filterDate, setFilterDate] = useState(new Date().toISOString().split("T")[0]);
 
-  useEffect(() => {
-    fetchAttendance();
-  }, [filterDate]);
-
-  const fetchAttendance = async () => {
+  const fetchAttendance = useCallback(async () => {
+    setLoading(true);
+    setError("");
     try {
-      const res = await axios.get(`/api/attendance?start_date=${filterDate}&end_date=${filterDate}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setAttendance(res.data || []);
-    } catch (err) {
-      console.error(err);
+      const res = await axios.get(`/api/attendance?start_date=${filterDate}&end_date=${filterDate}`);
+      setAttendance(Array.isArray(res.data) ? res.data : []);
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || "Attendance records could not be loaded.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterDate]);
 
-  const updateStatus = async (id, newStatus) => {
+  useEffect(() => {
+    fetchAttendance();
+  }, [fetchAttendance]);
+
+  const updateAttendance = async (id, updates) => {
     try {
-      await axios.put(`/api/attendance/${id}`, { status: newStatus }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await axios.put(`/api/attendance/${id}`, updates);
       fetchAttendance();
-    } catch (err) {
-      alert('Failed to update status');
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || "Attendance could not be updated.");
     }
   };
-  const confirmAttendance = async (id) => {
-  try {
-    await axios.put(
-      `/api/attendance/${id}`,
-      {
-        finalized: true
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      }
-    );
-
-    fetchAttendance();
-  } catch (err) {
-    alert('Failed to confirm attendance');
-  }
-};
 
   return (
-    <div className="dashboard-layout">   {/* ← Important */}
-      <Sidebar />
-      <div className="dashboard-content">   {/* ← Important */}
-        <h1 className="page-title">Attendance Management</h1>
-        <p className="page-subtitle">Track daily attendance and make overrides</p>
-
-        <div className="mb-6">
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-            className="form-control"
-            style={{ width: 'auto', display: 'inline-block' }}
-          />
+    <AdminLayout>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Attendance Management</h1>
+          <p className="page-subtitle">Review employee punch-ins and finalize daily status.</p>
         </div>
-
-        <div className="card-standard">
+        <input type="date" value={filterDate} onChange={(event) => setFilterDate(event.target.value)} className="form-control date-filter" />
+      </div>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <div className="card-standard">
+        <div className="table-wrapper">
           <table className="table-standard">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Punch In</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Employee</th><th>Punch in</th><th>Status</th><th>Review</th></tr></thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="4" style={{ textAlign: 'center', padding: '40px' }}>Loading...</td></tr>
+                <tr><td colSpan="4" className="table-message">Loading attendance...</td></tr>
               ) : attendance.length === 0 ? (
-                <tr><td colSpan="4" style={{ textAlign: 'center', padding: '40px' }}>No records found for this date.</td></tr>
-              ) : (
-                attendance.map(record => (
-                  <tr key={record.id}>
-                    <td>{record.full_name}</td>
-                    <td>{record.punch_in ? new Date(record.punch_in).toLocaleTimeString() : '-'}</td>
-                    <td>
-                      <span className={`px-3 py-1 rounded-full text-sm ${record.status === 'Present' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {record.status || 'Absent'}
-                      </span>
-                    </td>
-                    <td>
-  {record.finalized ? (
-    <span className="badge bg-success">
-      Confirmed
-    </span>
-  ) : (
-    <div style={{ display: 'flex', gap: '10px' }}>
-      <select
-        value={record.status || 'Absent'}
-        onChange={(e) => updateStatus(record.id, e.target.value)}
-        className="form-select"
-      >
-        <option value="Present">Present</option>
-        <option value="Absent">Absent</option>
-        <option value="Leave">Leave</option>
-      </select>
-
-      <button
-        className="btn btn-success"
-        onClick={() => confirmAttendance(record.id)}
-      >
-        Confirm
-      </button>
-    </div>
-  )}
-</td>
-                  </tr>
-                ))
-              )}
+                <tr><td colSpan="4" className="table-message">No punch-ins found for this date.</td></tr>
+              ) : attendance.map((record) => (
+                <tr key={record.id}>
+                  <td><strong>{record.full_name}</strong><div className="page-subtitle">{record.designation || "Employee"}</div></td>
+                  <td>{record.punch_in ? new Date(record.punch_in).toLocaleTimeString() : "-"}</td>
+                  <td><span className={`status-pill ${record.status === "Present" ? "success" : record.status === "Leave" ? "warning" : "danger"}`}>{record.status || "Absent"}</span></td>
+                  <td>
+                    {record.finalized ? <span className="status-pill success">Confirmed</span> : (
+                      <div className="attendance-actions">
+                        <select value={record.status || "Absent"} onChange={(event) => updateAttendance(record.id, { status: event.target.value })} className="form-select">
+                          <option value="Present">Present</option><option value="Absent">Absent</option><option value="Leave">Leave</option>
+                        </select>
+                        <button className="btn btn-success btn-sm" onClick={() => updateAttendance(record.id, { finalized: true })}>Confirm</button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
-};
-
-export default AdminAttendance;
+}

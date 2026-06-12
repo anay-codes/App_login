@@ -52,16 +52,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Admin: Update attendance
-router.put('/:id', async (req, res) => {
-  try {
-    const result = await attendanceService.updateAttendance(req.params.id, req.body);
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // Monthly Summary
 router.get('/summary', async (req, res) => {
   try {
@@ -71,6 +61,17 @@ router.get('/summary', async (req, res) => {
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Update attendance
+router.put('/:id', async (req, res) => {
+  try {
+    const result = await attendanceService.updateAttendance(req.params.id, req.body);
+    res.json(result);
+  } catch (err) {
+    const status = err.message === 'Attendance record not found' ? 404 : 400;
+    res.status(status).json({ error: err.message });
   }
 });
 

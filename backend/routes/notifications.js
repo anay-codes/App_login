@@ -75,7 +75,7 @@ router.post("/broadcast", async (req, res) => {
       return res.status(400).json({ success: false, message: "title and message required" });
 
     const employees = await require("../config/db").query(
-      "SELECT user_id FROM employee_profiles"
+      "SELECT DISTINCT user_id FROM employee_profiles WHERE user_id IS NOT NULL"
     );
 
     const promises = employees.rows.map(emp =>

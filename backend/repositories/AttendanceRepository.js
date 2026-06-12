@@ -41,10 +41,11 @@ class AttendanceRepository {
 
   async getAllAttendance(filter = {}) {
     let query = `
-     SELECT a.*, u.name, ep.designation
+     SELECT a.*, u.name AS full_name, ep.designation
 FROM attendance a
 JOIN employee_profiles ep ON a.employee_id = ep.id
 JOIN users u ON ep.user_id = u.id
+WHERE 1 = 1
     `;
     const values = [];
     let paramCount = 0;
@@ -96,16 +97,17 @@ JOIN users u ON ep.user_id = u.id
   async getMonthlySummary(year, month) {
     const result = await pool.query(`
       SELECT 
-        ep.full_name,
+        u.name AS full_name,
         COUNT(CASE WHEN a.status = 'Present' THEN 1 END) as present_days,
         COUNT(CASE WHEN a.status = 'Absent' THEN 1 END) as absent_days,
         COUNT(CASE WHEN a.status = 'Leave' THEN 1 END) as leave_days
       FROM employee_profiles ep
+      JOIN users u ON ep.user_id = u.id
       LEFT JOIN attendance a ON ep.id = a.employee_id 
         AND EXTRACT(YEAR FROM a.date) = $1 
         AND EXTRACT(MONTH FROM a.date) = $2
-      GROUP BY ep.id, ep.full_name
-      ORDER BY ep.full_name
+      GROUP BY ep.id, u.name
+      ORDER BY u.name
     `, [year, month]);
     return result.rows;
   }

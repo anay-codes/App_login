@@ -1,112 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import NavBar from '../NavBar';
+import React, { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import EmployeeLayout from "../components/EmployeeLayout";
 
-const MarkAttendance = () => {
+export default function MarkAttendance() {
   const [todayAttendance, setTodayAttendance] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
-
-  const profile = JSON.parse(localStorage.getItem('profile') || '{}');
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+  const profile = JSON.parse(localStorage.getItem("profile") || "{}");
   const employeeId = profile.id;
 
-  useEffect(() => {
-    fetchTodayAttendance();
-  }, []);
-
-  const fetchTodayAttendance = async () => {
+  const fetchTodayAttendance = useCallback(async () => {
+    if (!employeeId) {
+      setMessage({ type: "danger", text: "Employee profile is unavailable. Please sign in again." });
+      setLoading(false);
+      return;
+    }
     try {
-      const res = await axios.get(`/api/attendance/today?employee_id=${employeeId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await axios.get(`/api/attendance/today?employee_id=${employeeId}`);
       setTodayAttendance(res.data);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      setMessage({ type: "danger", text: error.response?.data?.error || "Unable to load attendance." });
     } finally {
       setLoading(false);
     }
-  };
+  }, [employeeId]);
+
+  useEffect(() => {
+    fetchTodayAttendance();
+  }, [fetchTodayAttendance]);
 
   const handlePunchIn = async () => {
+    setSubmitting(true);
     try {
-      const res = await axios.post('/api/attendance/punch-in', {
-        employee_id: employeeId
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      
+      const res = await axios.post("/api/attendance/punch-in", { employee_id: employeeId });
       setTodayAttendance(res.data);
-      setMessage('✅ Successfully punched in!');
-      setTimeout(() => setMessage(''), 4000);
-    } catch (err) {
-      setMessage('❌ ' + (err.response?.data?.error || 'Failed to punch in'));
+      setMessage({ type: "success", text: "Successfully punched in." });
+    } catch (error) {
+      setMessage({ type: "danger", text: error.response?.data?.error || "Failed to punch in." });
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  const hasPunchedIn = Boolean(todayAttendance?.punch_in);
+  const statusText = todayAttendance?.finalized
+    ? `Attendance confirmed as ${todayAttendance.status}.`
+    : "Attendance is pending admin review.";
+
   return (
-    <div className="dashboard-layout">
-      <NavBar />
-      <div className="dashboard-content">
-        <h1 className="page-title">Mark Attendance</h1>
-        <p className="page-subtitle">Today: {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-
-        {message && (
-          <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-danger'}`}>
-            {message}
-          </div>
-        )}
-
-        <div className="card-standard text-center" style={{ maxWidth: '500px', margin: '0 auto' }}>
-          {loading ? (
-            <p>Loading today's record...</p>
-            ) : todayAttendance && todayAttendance.punch_in ? (
-  <div>
-    {todayAttendance.finalized ? (
-      <>
-        <div className="text-5xl mb-4">
-          {todayAttendance.status === 'Present' ? '✅' : '❌'}
-        </div>
-
-        <h2 className="text-3xl font-bold mb-2">
-          {todayAttendance.status === 'Present' && 'Attendance Confirmed: Present'}
-          {todayAttendance.status === 'Absent' && 'Marked Absent by Admin'}
-          {todayAttendance.status === 'Leave' && 'Leave Approved'}
-        </h2>
-
-        <p className="text-lg text-gray-600">
-          Finalized by Admin
-        </p>
-      </>
-    ) : (
-      <>
-        <div className="text-5xl mb-4">⏳</div>
-
-        <h2 className="text-3xl font-bold text-warning mb-2">
-          Attendance Pending Review
-        </h2>
-
-        <p className="text-lg text-gray-600">
-          Punched in at: <strong>{new Date(todayAttendance.punch_in).toLocaleTimeString()}</strong>
-        </p>
-      </>
-    )}
-  </div>
-) : (
-            <div>
-              <div className="text-5xl mb-6">🕒</div>
-              <button
-                onClick={handlePunchIn}
-                className="btn btn-primary text-xl px-16 py-6 rounded-2xl font-semibold"
-              >
-                Punch In Now
-              </button>
-              <p className="text-sm text-gray-500 mt-6">You can only punch in once per day</p>
-            </div>
-          )}
+    <EmployeeLayout>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Attendance</h1>
+          <p className="page-subtitle">{new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
         </div>
       </div>
-    </div>
+      {message.text && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+      <div className="card-standard attendance-card">
+        {loading ? <div className="spinner-border" /> : hasPunchedIn ? (
+          <>
+            <span className={`status-pill ${todayAttendance.finalized ? "success" : "warning"}`}>
+              {todayAttendance.finalized ? todayAttendance.status : "Pending review"}
+            </span>
+            <h2>{statusText}</h2>
+            <p className="page-subtitle">Punch-in time</p>
+            <p className="attendance-time">{new Date(todayAttendance.punch_in).toLocaleTimeString()}</p>
+          </>
+        ) : (
+          <>
+            <span className="status-pill neutral">Not marked</span>
+            <h2>Ready to start your workday?</h2>
+            <p className="page-subtitle">Attendance can be marked once per day.</p>
+            <button className="btn btn-primary" disabled={submitting || !employeeId} onClick={handlePunchIn}>
+              {submitting ? "Punching in..." : "Punch in now"}
+            </button>
+          </>
+        )}
+      </div>
+    </EmployeeLayout>
   );
-};
-
-export default MarkAttendance;
+}
