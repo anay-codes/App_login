@@ -15,7 +15,7 @@ export default function AuditLogs() {
   const loadLogs = async () => {
     setLoading(true);
     try {
-      let url = "https://app-login-po50.onrender.com/api/audit?";
+      let url = "/api/audit?";
       if (filters.entity_type) url += `entity_type=${filters.entity_type}&`;
       if (filters.action) url += `action=${filters.action}&`;
       

@@ -42,8 +42,8 @@ export default function AssetManagement() {
     setLoading(true);
     try {
       const [assetRes, allocRes] = await Promise.all([
-        axios.get("https://app-login-po50.onrender.com/api/assets"),
-        axios.get("https://app-login-po50.onrender.com/api/assets/allocations")
+        axios.get("/api/assets"),
+        axios.get("/api/assets/allocations")
       ]);
       setAssets(assetRes.data.data);
       setAllocations(allocRes.data.data);
@@ -57,7 +57,7 @@ export default function AssetManagement() {
 
   const loadEmployees = async () => {
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/employees");
+      const res = await axios.get("/api/employees");
       setEmployees(res.data);
     } catch (err) {
       console.error(err);
@@ -81,10 +81,10 @@ export default function AssetManagement() {
       purchase_cost: assetForm.purchase_cost || null,
     };
     if (currentAsset) {
-      await axios.put(`https://app-login-po50.onrender.com/api/assets/${currentAsset.id}`, payload);
+      await axios.put(`/api/assets/${currentAsset.id}`, payload);
       alert("Asset updated successfully");
     } else {
-      await axios.post("https://app-login-po50.onrender.com/api/assets", payload);
+      await axios.post("/api/assets", payload);
       alert("Asset created successfully");
     }
     setShowAssetModal(false);
@@ -98,7 +98,7 @@ export default function AssetManagement() {
   const deleteAsset = async (id) => {
     if (!window.confirm("Are you sure you want to delete this asset?")) return;
     try {
-      await axios.delete(`https://app-login-po50.onrender.com/api/assets/${id}`);
+      await axios.delete(`/api/assets/${id}`);
       loadData();
     } catch (err) {
       alert("Error deleting asset");
@@ -108,7 +108,7 @@ export default function AssetManagement() {
   const allocateAsset = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://app-login-po50.onrender.com/api/assets/allocate", {
+      await axios.post("/api/assets/allocate", {
         asset_id: currentAsset.id,
         ...allocateForm
       });
@@ -125,7 +125,7 @@ export default function AssetManagement() {
     const condition = window.prompt("Enter condition on return (e.g., Good, Damaged):", "Good");
     if (condition === null) return;
     try {
-      await axios.put(`https://app-login-po50.onrender.com/api/assets/allocations/${allocationId}/return`, {
+      await axios.put(`/api/assets/allocations/${allocationId}/return`, {
         condition_on_return: condition,
         returned_date: new Date().toISOString().split('T')[0]
       });

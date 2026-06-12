@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://app-login-po50.onrender.com/api",
+  baseURL: "/api",
   timeout: 15000
 });
 

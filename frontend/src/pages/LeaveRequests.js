@@ -24,7 +24,7 @@ export default function LeaveRequests() {
 
   const loadLeaveTypes = async () => {
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/leaves/leave-types");
+      const res = await axios.get("/api/leaves/leave-types");
       setLeaveTypes(res.data);
     } catch (error) {
       console.log(error);
@@ -43,7 +43,7 @@ export default function LeaveRequests() {
 
     setLoading(true);
     try {
-      await axios.post("https://app-login-po50.onrender.com/api/leaves/apply", {
+      await axios.post("/api/leaves/apply", {
         ...formData,
         employee_id
       });

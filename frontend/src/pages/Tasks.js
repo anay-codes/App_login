@@ -15,7 +15,7 @@ export default function Tasks() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://app-login-po50.onrender.com/api/tasks/my", {
+      const res = await axios.get("/api/tasks/my", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(res.data);
@@ -29,7 +29,7 @@ export default function Tasks() {
   const markDone = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`https://app-login-po50.onrender.com/api/tasks/${id}/done`, {}, {
+      await axios.put(`/api/tasks/${id}/done`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess("Task marked as done!");

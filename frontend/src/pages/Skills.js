@@ -25,7 +25,7 @@ function Skills() {
   const loadSkills = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/skills");
+      const res = await axios.get("/api/skills");
       setSkills(res.data);
     } catch (error) {
       console.log(error);
@@ -37,7 +37,7 @@ function Skills() {
   const handleAdd = async () => {
     if (!newName.trim()) return;
     try {
-      await axios.post("https://app-login-po50.onrender.com/api/skills", {
+      await axios.post("/api/skills", {
         skill_name: newName
       });
       setSuccess("Skill added.");
@@ -58,7 +58,7 @@ function Skills() {
   const handleEdit = async () => {
     if (!editName.trim()) return;
     try {
-      await axios.put(`https://app-login-po50.onrender.com/api/skills/${editId}`, {
+      await axios.put(`/api/skills/${editId}`, {
         skill_name: editName
       });
       setSuccess("Skill updated.");
@@ -72,7 +72,7 @@ function Skills() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this skill?")) return;
     try {
-      await axios.delete(`https://app-login-po50.onrender.com/api/skills/${id}`);
+      await axios.delete(`/api/skills/${id}`);
       setSuccess("Skill deleted.");
       loadSkills();
     } catch (error) {

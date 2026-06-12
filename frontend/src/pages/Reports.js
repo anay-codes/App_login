@@ -19,7 +19,7 @@ export default function Reports() {
   const loadReport = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`https://app-login-po50.onrender.com/api/reports/${reportType}?format=json`);
+      const res = await axios.get(`/api/reports/${reportType}?format=json`);
       setData(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -30,7 +30,7 @@ export default function Reports() {
 
   const loadDeptStats = async () => {
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/reports/department-stats");
+      const res = await axios.get("/api/reports/department-stats");
       setDeptStats(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -38,7 +38,7 @@ export default function Reports() {
   };
 
   const handleDownloadCSV = () => {
-    window.open(`https://app-login-po50.onrender.com/api/reports/${reportType}?format=csv`, '_blank');
+    window.open(`/api/reports/${reportType}?format=csv`, '_blank');
   };
 
   const renderTableHeaders = () => {

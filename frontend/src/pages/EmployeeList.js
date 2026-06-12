@@ -12,7 +12,7 @@ function EmployeeList() {
   const deleteEmployee = async (id) => {
     try {
       await axios.delete(
-        `https://app-login-po50.onrender.com/api/employees/${id}`
+        `/api/employees/${id}`
       );
       loadEmployees();
     } catch (error) {
@@ -28,7 +28,7 @@ function EmployeeList() {
     setLoading(true);
     try {
       const res = await axios.get(
-        "https://app-login-po50.onrender.com/api/employees"
+        "/api/employees"
       );
       setEmployees(res.data);
     } catch (error) {
@@ -108,7 +108,7 @@ function EmployeeList() {
                       <td>
                         {emp.profile_image ? (
                           <img
-                            src={`https://app-login-po50.onrender.com/uploads/${emp.profile_image}`}
+                            src={`/uploads/${emp.profile_image}`}
                             alt="profile"
                             className="table-image"
                           />
@@ -127,7 +127,7 @@ function EmployeeList() {
                       <td>
                         {emp.resume_file ? (
                           <a
-                            href={`https://app-login-po50.onrender.com/uploads/${emp.resume_file}`}
+                            href={`/uploads/${emp.resume_file}`}
                             target="_blank"
                             rel="noreferrer"
                             className="btn btn-primary btn-sm"
@@ -142,7 +142,7 @@ function EmployeeList() {
                       <td>
                         {emp.document_file ? (
                           <a
-                            href={`https://app-login-po50.onrender.com/uploads/${emp.document_file}`}
+                            href={`/uploads/${emp.document_file}`}
                             target="_blank"
                             rel="noreferrer"
                             className="btn btn-secondary btn-sm"

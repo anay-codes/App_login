@@ -48,11 +48,11 @@ function CreateEmployee() {
       if (document) uploadData.append("document", document);
 
       const uploadResponse = await axios.post(
-        "https://app-login-po50.onrender.com/api/upload",
+        "/api/upload",
         uploadData
       );
 
-      await axios.post("https://app-login-po50.onrender.com/api/employees", {
+      await axios.post("/api/employees", {
         ...formData,
         profile_image: uploadResponse.data.profile_image,
         resume_file: uploadResponse.data.resume_file,

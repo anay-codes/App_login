@@ -23,7 +23,7 @@ function LeaveList() {
   const loadLeaves = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/leaves");
+      const res = await axios.get("/api/leaves");
       setLeaves(res.data);
 
       const pending = res.data.filter(l => l.status === "Pending").length;
@@ -45,7 +45,7 @@ function LeaveList() {
     if (remarks === null) return;
 
     try {
-      await axios.put(`https://app-login-po50.onrender.com/api/leaves/approve/${id}`, { remarks });
+      await axios.put(`/api/leaves/approve/${id}`, { remarks });
       alert("Leave request approved successfully!");
       loadLeaves();
     } catch (err) {
@@ -59,7 +59,7 @@ function LeaveList() {
     if (remarks === null) return;
 
     try {
-      await axios.put(`https://app-login-po50.onrender.com/api/leaves/reject/${id}`, { remarks });
+      await axios.put(`/api/leaves/reject/${id}`, { remarks });
       alert("Leave request rejected.");
       loadLeaves();
     } catch (err) {

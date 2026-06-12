@@ -31,7 +31,7 @@ function CreateEmployee() {
     const fetchDepartments = async () => {
       try {
         const res = await axios.get(
-          "https://app-login-po50.onrender.com/api/departments"
+          "/api/departments"
         );
         setDepartments(res.data);
       } catch (error) {
@@ -75,12 +75,12 @@ function CreateEmployee() {
       if (document) uploadData.append("document", document);
 
       const uploadResponse = await axios.post(
-        "https://app-login-po50.onrender.com/api/upload",
+        "/api/upload",
         uploadData
       );
 
       await axios.post(
-        "https://app-login-po50.onrender.com/api/employees",
+        "/api/employees",
         {
           ...formData,
           profile_image: uploadResponse.data.profile_image,

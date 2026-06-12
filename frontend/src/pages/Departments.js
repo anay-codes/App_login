@@ -25,7 +25,7 @@ function Departments() {
   const loadDepartments = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/departments");
+      const res = await axios.get("/api/departments");
       setDepartments(res.data);
     } catch (error) {
       console.log(error);
@@ -37,7 +37,7 @@ function Departments() {
   const handleAdd = async () => {
     if (!newName.trim()) return;
     try {
-      await axios.post("https://app-login-po50.onrender.com/api/departments", {
+      await axios.post("/api/departments", {
         department_name: newName
       });
       setSuccess("Department added.");
@@ -58,7 +58,7 @@ function Departments() {
   const handleEdit = async () => {
     if (!editName.trim()) return;
     try {
-      await axios.put(`https://app-login-po50.onrender.com/api/departments/${editId}`, {
+      await axios.put(`/api/departments/${editId}`, {
         department_name: editName
       });
       setSuccess("Department updated.");
@@ -72,7 +72,7 @@ function Departments() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this department?")) return;
     try {
-      await axios.delete(`https://app-login-po50.onrender.com/api/departments/${id}`);
+      await axios.delete(`/api/departments/${id}`);
       setSuccess("Department deleted.");
       loadDepartments();
     } catch (error) {

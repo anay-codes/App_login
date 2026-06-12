@@ -26,7 +26,7 @@ export default function AdminTasks() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://app-login-po50.onrender.com/api/tasks", {
+      const res = await axios.get("/api/tasks", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(res.data);
@@ -39,7 +39,7 @@ export default function AdminTasks() {
 
   const loadEmployees = async () => {
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/employees");
+      const res = await axios.get("/api/employees");
       setEmployees(res.data);
     } catch (error) {
       console.log(error);
@@ -53,7 +53,7 @@ export default function AdminTasks() {
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://app-login-po50.onrender.com/api/tasks", formData, {
+      await axios.post("/api/tasks", formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess("Task created!");
@@ -69,7 +69,7 @@ export default function AdminTasks() {
     if (!window.confirm("Delete this task?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://app-login-po50.onrender.com/api/tasks/${id}`, {
+      await axios.delete(`/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess("Task deleted.");

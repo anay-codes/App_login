@@ -35,7 +35,7 @@ function EditEmployee() {
 
   async function loadDepartments() {
     try {
-      const res = await axios.get("https://app-login-po50.onrender.com/api/departments");
+      const res = await axios.get("/api/departments");
       setDepartments(res.data);
     } catch (error) {
       console.log(error);
@@ -45,7 +45,7 @@ function EditEmployee() {
   const loadEmployee = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`https://app-login-po50.onrender.com/api/employees/${id}`);
+      const res = await axios.get(`/api/employees/${id}`);
       const d = res.data;
       setFormData({
         name: d.name || "",
@@ -86,13 +86,13 @@ function EditEmployee() {
         if (resume) uploadData.append("resume", resume);
         if (document) uploadData.append("document", document);
 
-        const uploadRes = await axios.post("https://app-login-po50.onrender.com/api/upload", uploadData);
+        const uploadRes = await axios.post("/api/upload", uploadData);
         profile_image = uploadRes.data.profile_image;
         resume_file = uploadRes.data.resume_file;
         document_file = uploadRes.data.document_file;
       }
 
-      await axios.put(`https://app-login-po50.onrender.com/api/employees/${id}`, {
+      await axios.put(`/api/employees/${id}`, {
         ...formData,
         ...(profile_image && { profile_image }),
         ...(resume_file && { resume_file }),

@@ -18,7 +18,7 @@ export default function LeaveBalance() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://app-login-po50.onrender.com/api/leaves/balance/${employee_id}`
+        `/api/leaves/balance/${employee_id}`
       );
       setBalances(res.data);
     } catch (error) {

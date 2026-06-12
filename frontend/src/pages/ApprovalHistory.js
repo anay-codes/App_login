@@ -18,7 +18,7 @@ export default function ApprovalHistory() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://app-login-po50.onrender.com/api/leaves/my/${employee_id}`
+        `/api/leaves/my/${employee_id}`
       );
       setLeaves(res.data);
     } catch (error) {

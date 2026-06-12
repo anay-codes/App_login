@@ -42,7 +42,7 @@ function Signup() {
 
     try {
       const res = await axios.post(
-        "https://app-login-po50.onrender.com/api/auth/signup",
+        "/api/auth/signup",
         form
       );
 
