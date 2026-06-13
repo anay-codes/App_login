@@ -1,0 +1,65 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role VARCHAR(50) DEFAULT 'Employee',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+  id SERIAL PRIMARY KEY,
+  department_name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS skills (
+  id SERIAL PRIMARY KEY,
+  skill_name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS employee_profiles (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+  designation VARCHAR(255),
+  profile_image VARCHAR(255),
+  resume_file VARCHAR(255),
+  document_file VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS employee_skills (
+  id SERIAL PRIMARY KEY,
+  employee_id INTEGER REFERENCES employee_profiles(id) ON DELETE CASCADE,
+  skill_id INTEGER REFERENCES skills(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS leave_applications (
+  id SERIAL PRIMARY KEY,
+  employee_id INTEGER REFERENCES employee_profiles(id) ON DELETE CASCADE,
+  leave_type VARCHAR(100),
+  start_date DATE,
+  end_date DATE,
+  reason TEXT,
+  status VARCHAR(50) DEFAULT 'Pending',
+  applied_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  assigned_to INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  status VARCHAR(50) DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS attendance (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  date DATE DEFAULT CURRENT_DATE,
+  status VARCHAR(50),
+  punch_in TIMESTAMP,
+  punch_out TIMESTAMP
+);
